@@ -13,6 +13,11 @@
 *{box-sizing:border-box}body{margin:0;padding:12px;font-family:Arial;background:var(--bg);color:var(--text)}.app{max-width:900px;margin:auto}.card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border)}h1{margin:0;text-align:center;color:var(--blue);font-size:22px}.sub{text-align:center;color:var(--muted);font-size:12px;margin:8px 0 18px}label{display:block;margin-top:12px;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:bold}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:16px;font-weight:bold}button{width:100%;padding:15px;margin-top:16px;border:none;border-radius:12px;cursor:pointer;font-weight:900;font-size:15px;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#020617}.result{margin-top:16px;padding:16px;border-radius:14px;background:var(--card2);border:1px solid var(--border)}.error{color:#fca5a5;font-weight:bold;line-height:1.5}.success{color:#bbf7d0}table{width:100%;border-collapse:collapse;margin-top:8px}th{color:var(--muted);font-size:10px;text-align:left;padding:8px 4px}td{padding:8px 4px;border-bottom:1px solid #1e293b}.val-blue{color:var(--blue);font-weight:800}.val-pink{color:var(--pink);font-weight:800}.summary{margin-top:14px;padding:12px;background:#0f172a;border-radius:10px;line-height:1.8;font-size:14px}.badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900;margin-top:8px}.badge.play{background:#14532d;color:#bbf7d0}.badge.trans{background:#713f12;color:#fde68a}.badge.inter{background:#7f1d1d;color:#fecaca}canvas{width:100%;display:block;margin-top:16px;background:#fff;border-radius:12px}.note{margin-top:15px;padding:12px;border-radius:10px;background:#172033;color:var(--muted);font-size:11px;line-height:1.5}
 </style>
 </head>
+ <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
 <body>
 <div class="app"><div class="card">
 <h1>⚙ CALCOLATORE ACCOPPIAMENTI ISO 286 V2</h1>
