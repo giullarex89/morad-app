@@ -1,12 +1,23 @@
 {
-  "name": "Calcolatore Tolleranze ISO 286 OUAID",
-  "short_name": "ISO Tolleranze",
+  "name": "Tolleranze",
+  "short_name": "Tolleranze",
+  "description": "Calcolatore accoppiamento tolleranze dimensionali e accoppiamenti foro-albero ISO 286",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#38bdf8",
   "icons": [
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
