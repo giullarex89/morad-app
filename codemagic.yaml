@@ -21,11 +21,30 @@ workflows:
           sed -i '' "s/13.0/14.0/g" ios/App/Podfile || true
           ICON_SRC=$(ls | grep -i "appicon.*png" | head -n 1)
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          if [ -n "$ICON_SRC" ]; then cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"; sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true; sips -z 120 120 "$ICON_SRC" --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true; fi
+          if [ -n "$ICON_SRC" ]; then
+            cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"
+            sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true
+            sips -z 120 120 "$ICON_SRC" --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true
+          fi
+      - name: Create Export Options
+        script: |
+          cat > /Users/builder/export_options.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          cat /Users/builder/export_options.plist
       - name: Build IPA
         script: |
           cd ios/App && pod install --repo-update
           cd ../..
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App --export-options-plist /Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
