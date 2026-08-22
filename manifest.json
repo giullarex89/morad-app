@@ -1,21 +1,51 @@
-{
-  "name": "Tolleranze",
-  "short_name": "Tolleranze",
-  "description": "Calcolo tolleranze dimensionali e accoppiamenti foro albero ISO 286 per meccanica di precisione",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#38bdf8",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/webp"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+workflows:
+  ios-pwa:
+    name: iOS PWA Build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Morad Admin
+    environment:
+      xcode: latest
+      node: 20
+      cocoapods: default
+    scripts:
+      - name: Prep Web Assets & Capacitor
+        script: |
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save --force
+          
+          # 1. Copia tutti i file web nella cartella dist
+          mkdir -p dist
+          cp -R *.html *.png manifest.json dist/ 2>/dev/null || true
+          
+          # 2. Configura Capacitor
+          echo '{"appId":"com.ouaid.tolleranze","appName":"ISO Tolleranze","webDir":"dist"}' > capacitor.config.json
+          
+          # 3. Genera ed allinea la piattaforma iOS
+          rm -rf ios
+          npx cap add ios
+          npx cap sync ios
+          
+          # 4. Aggiorna Pods
+          cd ios/App && pod install --repo-update && cd ../..
+
+      - name: Automatic Code Signing
+        script: |
+          app-store-connect certificates create --type IOS_DISTRIBUTION --save
+          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
+          keychain initialize
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: Build IPA Firmata
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
