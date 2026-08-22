@@ -8,34 +8,37 @@ workflows:
       node: 20
       cocoapods: default
     scripts:
-      - name: Create Project and iOS
+      - name: Create iOS Project
         script: |
           if [ ! -f package.json ]; then
-            echo "Creo package.json mancante"
             echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json
           fi
           npm install --force
           npm install @capacitor/core @capacitor/cli @capacitor/ios --save
           mkdir -p dist
-          if [ -f index.html ]; then cp index.html dist/index.html || true; fi
+          if [ -f index.html ]; then cp index.html dist/ 2>/dev/null || true; fi
           if [ ! -f dist/index.html ]; then echo "<html><body><h1>Morad</h1></body></html>" > dist/index.html; fi
           echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
+          rm -rf ios
           npx cap add ios
-          npx cap copy ios
-          ls -R ios | head -n 100
-      - name: Set Blue Icon
+      - name: Fix Pods and Icon
         script: |
+          # Alzo target a iOS 14
+          sed -i '' "s/platform :ios, '.*'/platform :ios, '14.0'/" ios/App/Podfile || true
+          sed -i '' 's/iOS 13.0/iOS 14.0/g' ios/App/Podfile || true
+          echo "platform :ios, '14.0'" | cat - ios/App/Podfile > /tmp/Podfile && mv /tmp/Podfile ios/App/Podfile || true
+          cat ios/App/Podfile
+          # Icona blu
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
           if [ -f AppIcon.png ]; then
             cp AppIcon.png "$ICONSET/AppIcon-1024.png"
-            sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
-            sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
-            echo "Icona BLU messa"
+            sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true
+            sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true
           fi
       - name: Build IPA
         script: |
           cd ios/App && pod install --repo-update
           cd ../..
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App --export-method ad-hoc
     artifacts:
       - build/ios/ipa/*.ipa
