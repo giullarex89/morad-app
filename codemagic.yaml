@@ -12,33 +12,20 @@ workflows:
     scripts:
       - name: Setup Project
         script: |
-          if [ ! -f package.json ]; then
-            echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json
-          fi
+          if [ ! -f package.json ]; then echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json; fi
           npm install --force
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save
-          mkdir -p dist
-          cp index.html dist/ 2>/dev/null || echo "index mancante, creo placeholder" && echo "<h1>App</h1>" > dist/index.html
+          mkdir -p dist && cp index.html dist/ 2>/dev/null || echo "<h1>App</h1>" > dist/index.html
           echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          rm -rf ios
-          npx cap add ios
+          rm -rf ios && npx cap add ios
       - name: Fix Icon Blu
         script: |
-          echo "Cerco icona..."
           ICON_SRC=$(ls | grep -i "appicon.*png" | head -n 1)
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          if [ -n "$ICON_SRC" ]; then
-            echo "Trovata icona: $ICON_SRC"
-            cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"
-            sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true
-            sips -z 120 120 "$ICON_SRC" --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true
-            sips -z 60 60 "$ICON_SRC" --out "$ICONSET/AppIcon-20@3x.png" 2>/dev/null || true
-          else
-            echo "Nessuna icona custom trovata, uso default"
-          fi
+          if [ -n "$ICON_SRC" ]; then cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"; sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true; fi
       - name: Setup signing with Apple 99€
         script: |
-          app-store-connect fetch-signing-files com.morad.tolleranze --type IOS_APP_DEVELOPMENT --create
+          app-store-connect fetch-signing-files com.morad.tolleranze --type IOS_APP_STORE --create
           keychain initialize
           keychain add-certificates
           xcode-project use-profiles
@@ -48,4 +35,3 @@ workflows:
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/xcarchive/*.xcarchive
