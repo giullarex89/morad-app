@@ -19,85 +19,123 @@ workflows:
         script: |
           set -e
 
-          echo "=== Creating npm project ==="
+          echo "======================================"
+          echo "1. PREPARING NPM PROJECT"
+          echo "======================================"
 
           if [ ! -f package.json ]; then
             npm init -y
           fi
 
-          echo "=== Installing Capacitor ==="
+          echo "======================================"
+          echo "2. INSTALLING CAPACITOR"
+          echo "======================================"
 
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6
 
-          echo "=== Preparing web files ==="
+          echo "======================================"
+          echo "3. PREPARING WEB APP"
+          echo "======================================"
 
           mkdir -p dist
 
           if [ -f index.html ]; then
             cp index.html dist/index.html
           else
-            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tolleranze Morad</title></head><body><h1>Tolleranze Morad</h1></body></html>' > dist/index.html
+            cat > dist/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tolleranze Morad</title>
+          </head>
+          <body>
+            <h1>Tolleranze Morad</h1>
+          </body>
+          </html>
+          EOF
           fi
 
-          echo "=== Creating Capacitor config ==="
+          echo "======================================"
+          echo "4. CREATING CAPACITOR CONFIG"
+          echo "======================================"
 
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.ouaid.tolleranze",
-            "appName": "Tolleranze Morad",
+            "appName": "Morad O. app",
             "webDir": "dist"
           }
           EOF
 
-          echo "=== Creating iOS project ==="
+          echo "======================================"
+          echo "5. CREATING IOS PROJECT"
+          echo "======================================"
 
           rm -rf ios
 
           npx cap add ios
 
-          echo "=== Installing CocoaPods ==="
+          echo "======================================"
+          echo "6. INSTALLING COCOAPODS"
+          echo "======================================"
 
           cd ios/App
           pod install
           cd ../..
 
-          echo "=== Setup completed ==="
+          echo "======================================"
+          echo "SETUP COMPLETED"
+          echo "======================================"
 
-      - name: Create Signing
+      - name: Configure Code Signing
         script: |
           set -e
 
-          echo "=== Initializing keychain ==="
+          echo "======================================"
+          echo "7. INITIALIZING KEYCHAIN"
+          echo "======================================"
 
           keychain initialize
 
-          echo "=== Fetching signing files ==="
-
-          app-store-connect fetch-signing-files \
-            com.ouaid.tolleranze \
-            --type IOS_APP_STORE \
-            --create
-
-          echo "=== Installing certificates ==="
+          echo "======================================"
+          echo "8. INSTALLING CODE SIGNING CERTIFICATES"
+          echo "======================================"
 
           keychain add-certificates
 
-          echo "=== Applying signing profiles ==="
+          echo "======================================"
+          echo "9. APPLYING PROVISIONING PROFILES"
+          echo "======================================"
 
           xcode-project use-profiles
+
+          echo "======================================"
+          echo "CODE SIGNING CONFIGURED"
+          echo "======================================"
 
       - name: Build IPA
         script: |
           set -e
 
-          echo "=== Building IPA ==="
+          echo "======================================"
+          echo "10. BUILDING IOS IPA"
+          echo "======================================"
 
           xcode-project build-ipa \
             --workspace ios/App/App.xcworkspace \
             --scheme App
 
-          echo "=== IPA files ==="
+          echo "======================================"
+          echo "11. SEARCHING FOR IPA"
+          echo "======================================"
+
           find . -name "*.ipa" -print
+
+          echo "======================================"
+          echo "BUILD COMPLETED"
+          echo "======================================"
 
     artifacts:
       - build/ios/ipa/*.ipa
