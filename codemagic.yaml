@@ -10,41 +10,22 @@ workflows:
     scripts:
       - name: Setup Project
         script: |
-          if [ ! -f package.json ]; then
-            echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json
-          fi
+          if [ ! -f package.json ]; then echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json; fi
           npm install --force
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save
-          mkdir -p dist
-          cp index.html dist/ 2>/dev/null || true
-          if [ ! -f dist/index.html ]; then echo "<html><body><h1>Morad</h1></body></html>" > dist/index.html; fi
+          mkdir -p dist && cp index.html dist/ 2>/dev/null || true
           echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          rm -rf ios
-          npx cap add ios
-          ls ios/App/ | head -n 20
-      - name: Fix Deployment Target and Icon
+          rm -rf ios && npx cap add ios
+      - name: Fix and Icon
         script: |
-          # Fix per errore "higher minimum deployment target" - uso iOS 14
-          echo "Fix Podfile..."
           sed -i '' "s/13.0/14.0/g" ios/App/Podfile || true
-          sed -i '' "s/14.0/14.0/g" ios/App/Podfile || true
-          # Forzo platform a 14.0 all'inizio
-          grep -q "platform :ios" ios/App/Podfile && sed -i '' "s/platform :ios.*/platform :ios, '14.0'/" ios/App/Podfile || echo "platform :ios, '14.0'" >> ios/App/Podfile
-          cat ios/App/Podfile
-          # Icona - prendo qualsiasi file che contiene AppIcon
           ICON_SRC=$(ls | grep -i "appicon.*png" | head -n 1)
-          echo "Uso icona: $ICON_SRC"
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          if [ -n "$ICON_SRC" ] && [ -f "$ICON_SRC" ]; then
-            cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"
-            sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true
-            sips -z 120 120 "$ICON_SRC" --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true
-            echo "Icona blu installata"
-          fi
+          if [ -n "$ICON_SRC" ]; then cp "$ICON_SRC" "$ICONSET/AppIcon-1024.png"; sips -z 180 180 "$ICON_SRC" --out "$ICONSET/AppIcon-60@3x.png" 2>/dev/null || true; sips -z 120 120 "$ICON_SRC" --out "$ICONSET/AppIcon-60@2x.png" 2>/dev/null || true; fi
       - name: Build IPA
         script: |
           cd ios/App && pod install --repo-update
           cd ../..
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App --export-method ad-hoc
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
