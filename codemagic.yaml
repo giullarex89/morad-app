@@ -8,32 +8,31 @@ workflows:
       node: 20
       cocoapods: default
     scripts:
-      - name: Clean and Create iOS
+      - name: Create Project and iOS
         script: |
-          rm -rf ios
+          if [ ! -f package.json ]; then
+            echo "Creo package.json mancante"
+            echo '{"name":"morad-tolleranze","version":"1.0.0","private":true}' > package.json
+          fi
           npm install --force
           npm install @capacitor/core @capacitor/cli @capacitor/ios --save
           mkdir -p dist
           if [ -f index.html ]; then cp index.html dist/index.html || true; fi
-          if [ ! -f dist/index.html ]; then echo "<html><body><h1>Morad Tolleranze</h1></body></html>" > dist/index.html; fi
+          if [ ! -f dist/index.html ]; then echo "<html><body><h1>Morad</h1></body></html>" > dist/index.html; fi
           echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          cat capacitor.config.json
           npx cap add ios
           npx cap copy ios
-          echo "--- CONTENUTO IOS ---"
-          ls -R ios
-      - name: Set App Icon
+          ls -R ios | head -n 100
+      - name: Set Blue Icon
         script: |
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          mkdir -p "$ICONSET"
           if [ -f AppIcon.png ]; then
             cp AppIcon.png "$ICONSET/AppIcon-1024.png"
-            sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png" || true
             sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
             sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
-            echo "Icona installata"
+            echo "Icona BLU messa"
           fi
-      - name: Pods and Build
+      - name: Build IPA
         script: |
           cd ios/App && pod install --repo-update
           cd ../..
