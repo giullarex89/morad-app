@@ -8,33 +8,19 @@ workflows:
     environment:
       xcode: latest
       node: 20
-      cocoapods: default
     scripts:
-      - name: Prep
+      - name: Set up signing
         script: |
-          npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save --force
-          mkdir -p dist
-          cp index.html manifest.json *.png dist/ 2>/dev/null || true
-          cp sw.js dist/ 2>/dev/null || true
-          echo '{"appId":"com.ouaid.tolleranze","appName":"Tolleranze","webDir":"dist"}' > capacitor.config.json
-          rm -rf ios
-          npx cap add ios
-          npx cap sync ios
-          cd ios/App && pod install --repo-update && cd ../..
-      - name: Code Signing DEBUG
-        script: |
-          set -x
           keychain initialize
-          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create --platform IOS -v || true
-          echo "--- LIST FILES ---"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/ || true
-          ls -la ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/ || true
+          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
           keychain add-certificates
-          xcode-project use-profiles --warn-only
-      - name: Build IPA with AUTO signing
+          xcode-project use-profiles
+      - name: Build
         script: |
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App --archive-flags="CODE_SIGN_STYLE=Manual"
+          npm install
+          npx cap add ios || true
+          npx cap sync ios
+          cd ios/App && pod install && cd ../..
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
