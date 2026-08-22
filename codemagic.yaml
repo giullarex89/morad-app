@@ -1,37 +1,45 @@
 workflows:
-  ios-pwa-tolleranze:
-    name: iOS Tolleranze Build
+  ios-pwa:
+    name: iOS PWA Build
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
+      vars:
+        XCODE_WORKSPACE: "App/App.xcworkspace"
+        XCODE_SCHEME: "App"
       xcode: latest
+      node: 20
       cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
     scripts:
-      - name: Crea progetto Xcode per PWA
+      - name: Install Capacitor
         script: |
-          # Crea struttura progetto iOS semplice che carica il tuo sito
-          mkdir -p Tolleranze/Tolleranze
-          cat > Tolleranze/Tolleranze.xcodeproj/project.pbxproj << 'EOF'
-          // Questo viene generato automaticamente da Codemagic
+          npm i -g @capacitor/cli
+          npm init -y || true
+          npm install @capacitor/core @capacitor/ios
+          npx cap init "Tolleranze" "com.morad.tolleranze" --web-dir="." || true
+          npx cap add ios || true
+          # crea config che punta al tuo sito
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.morad.tolleranze",
+            "appName": "Tolleranze",
+            "webDir": ".",
+            "server": {
+              "url": "https://giullarex89.github.io/morad-app/",
+              "cleartext": true
+            }
+          }
           EOF
-          
-          # Usiamo Capacitor per trasformare il sito in App iOS
-          npm install -g @capacitor/cli
-          npx cap init Tolleranze io.github.giullarex89.morad-app --web-dir=.
-          npx cap add ios
-          
-          # Configura l'URL della tua PWA
-          echo '{"server": {"url": "https://giullarex89.github.io/morad-app", "cleartext": true}}' > capacitor.config.json
-          
-      - name: Build IPA
+          npx cap copy ios
+      - name: Set up code signing
         script: |
-          cd Tolleranze
-          xcodebuild -workspace App/App.xcworkspace -scheme App -configuration Release archive -archivePath build/Tolleranze.xcarchive CODE_SIGNING_ALLOWED=NO
-          xcodebuild -exportArchive -archivePath build/Tolleranze.xcarchive -exportPath build/ipa -exportOptionsPlist exportOptions.plist
+          echo $APP_STORE_CONNECT_API_KEY > AuthKey.p8
     artifacts:
-      - Tolleranze/build/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_API_KEY
-        key_id: $APP_STORE_CONNECT_KEY_ID
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+      - App/build/*.ipa
+      - ios/App/build/*.ipa
