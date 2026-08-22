@@ -5,75 +5,43 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.morad.tolleranze"
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
       node: 20
       xcode: latest
       cocoapods: default
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
     scripts:
       - name: Install dependencies
         script: |
           npm install
           npm install @capacitor/core @capacitor/cli @capacitor/ios --save
-          
-      - name: Build PWA web
+      - name: Build web
         script: |
-          npm run build || npx vite build || echo "No build script, uso root"
-          
-      - name: Add iOS platform
+          npm run build || echo "build skip"
+      - name: Add iOS
         script: |
-          npx cap add ios || echo "ios gia presente"
+          npx cap add ios || true
           npx cap copy ios
-          
-      - name: Aggiungi Icona 1024 App Store
+      - name: Icona 1024
         script: |
-          echo "Cerco AppIcon.png..."
-          ls -lh | grep -i icon || echo "Nessuna icona in root"
-          if [ -f "AppIcon.png" ]; then
-            echo "Trovata AppIcon.png, la copio..."
+          if [ -f AppIcon.png ]; then
             ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
             mkdir -p "$ICONSET"
-            # 1024 per App Store
             sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png"
-            # Altre misure per device
-            sips -z 20 20 AppIcon.png --out "$ICONSET/AppIcon-20.png"
-            sips -z 29 29 AppIcon.png --out "$ICONSET/AppIcon-29.png"
-            sips -z 40 40 AppIcon.png --out "$ICONSET/AppIcon-40.png"
             sips -z 60 60 AppIcon.png --out "$ICONSET/AppIcon-60.png"
-            sips -z 76 76 AppIcon.png --out "$ICONSET/AppIcon-76.png"
-            sips -z 152 152 AppIcon.png --out "$ICONSET/AppIcon-152.png"
-            sips -z 167 167 AppIcon.png --out "$ICONSET/AppIcon-167.png"
-            echo "Icone generate!"
-            ls -lh "$ICONSET"
+            sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png"
+            sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png"
+            echo "Icona OK"
           else
-            echo "ATTENZIONE: AppIcon.png non trovata! Usera icona default."
+            echo "AppIcon.png non trovata"
           fi
-          
-      - name: Set up provisioning
+      - name: Install Pods
         script: |
           cd ios/App
           pod install
-          
       - name: Build IPA
         script: |
-          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+          xcode-project build-ipa --workspace $XCODE_WORKSPACE --scheme $XCODE_SCHEME
     artifacts:
       - build/ios/ipa/*.ipa
-      - ios/App/App/Assets.xcassets/AppIcon.appiconset/
       - /tmp/xcodebuild_logs/*.log
-    publishing:
-      app_store_connect:
-        auth: integration
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        beta_groups:
-          - Beta Testers
