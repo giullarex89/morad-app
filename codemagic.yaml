@@ -16,18 +16,28 @@ workflows:
           app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
-      - name: Install deps
+      - name: Find project and build
         script: |
-          npm ci || npm install
-          npm install @capacitor/cli @capacitor/core
-      - name: Add iOS and build IPA
-        script: |
+          pwd
+          ls -la
+          find . -maxdepth 4 -name package.json
+          PROJECT_DIR=$(find . -maxdepth 4 -name package.json | head -n 1 | xargs dirname)
+          if [ -n "$PROJECT_DIR" ]; then cd $PROJECT_DIR; fi
+          pwd
+          ls -la
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+          echo '{"appId":"com.ouaid.tolleranze","appName":"Morad","webDir":"."}' > capacitor.config.json
           npx cap add ios || true
-          npx cap copy ios
+          npx cap sync ios
           cd ios/App
-          pod install --repo-update
+          pod install
           cd ../..
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App --archive-directory build/ios/xcarchive --ipa-directory build/ios/ipa
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/xcarchive/*.xcarchive
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
