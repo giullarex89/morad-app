@@ -8,47 +8,35 @@ workflows:
       node: 20
       cocoapods: default
     scripts:
-      - name: Install dependencies
+      - name: Clean and Create iOS
         script: |
+          rm -rf ios
           npm install --force
-          npm install @capacitor/core @capacitor/cli @capacitor/ios --save || true
+          npm install @capacitor/core @capacitor/cli @capacitor/ios --save
           mkdir -p dist
-          if [ ! -f dist/index.html ] && [ -f index.html ]; then cp index.html dist/ || true; fi
-          if [ ! -f dist/index.html ]; then echo "<html><body><h1>Tolleranze Morad</h1></body></html>" > dist/index.html; fi
-          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
-            echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          fi
-          npx --yes @capacitor/cli add ios || true
-          npx --yes @capacitor/cli copy ios || true
-          ls -R ios || echo "cartella ios non creata"
+          if [ -f index.html ]; then cp index.html dist/index.html || true; fi
+          if [ ! -f dist/index.html ]; then echo "<html><body><h1>Morad Tolleranze</h1></body></html>" > dist/index.html; fi
+          echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
+          cat capacitor.config.json
+          npx cap add ios
+          npx cap copy ios
+          echo "--- CONTENUTO IOS ---"
+          ls -R ios
       - name: Set App Icon
         script: |
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
           mkdir -p "$ICONSET"
           if [ -f AppIcon.png ]; then
-            echo "Icona blu trovata"
             cp AppIcon.png "$ICONSET/AppIcon-1024.png"
             sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png" || true
             sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
             sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
+            echo "Icona installata"
           fi
-      - name: Install Pods
+      - name: Pods and Build
         script: |
-          if [ -f ios/App/Podfile ]; then
-            cd ios/App && pod install --repo-update
-          else
-            echo "Skip pods"
-          fi
-      - name: Build IPA
-        script: |
-          if [ -d "ios/App/App.xcworkspace" ]; then
-            xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
-          else
-            echo "Cerco workspace..."
-            find ios -name "*.xcworkspace" || true
-            echo "ERRORE: workspace non trovato"
-            ls -la ios/App/ || true
-            exit 1
-          fi
+          cd ios/App && pod install --repo-update
+          cd ../..
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
