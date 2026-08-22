@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 60
     integrations:
-      app_store_connect: Morad Admin
+      app_store_connect: "Morad Admin"
     environment:
       xcode: latest
       node: 20
@@ -13,20 +13,12 @@ workflows:
       - name: Prep Web Assets & Capacitor
         script: |
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save --force
-          
-          # 1. Copia tutti i file web nella cartella dist
           mkdir -p dist
           cp -R *.html *.png manifest.json dist/ 2>/dev/null || true
-          
-          # 2. Configura Capacitor
           echo '{"appId":"com.ouaid.tolleranze","appName":"ISO Tolleranze","webDir":"dist"}' > capacitor.config.json
-          
-          # 3. Genera ed allinea la piattaforma iOS
           rm -rf ios
           npx cap add ios
           npx cap sync ios
-          
-          # 4. Aggiorna Pods
           cd ios/App && pod install --repo-update && cd ../..
 
       - name: Automatic Code Signing
@@ -45,8 +37,3 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-
