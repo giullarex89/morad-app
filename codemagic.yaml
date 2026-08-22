@@ -1,50 +1,32 @@
 workflows:
   ios-pwa:
     name: iOS PWA Build
-    max_build_duration: 60
     instance_type: mac_mini_m2
+    max_build_duration: 60
     environment:
-      groups:
-        - AppStore
-      vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.morad.tolleranze"
-      node: 20
       xcode: latest
+      node: 20
       cocoapods: default
-    triggering:
-      events:
-        - push
     scripts:
       - name: Install
         script: |
           npm install
-          npm run build || echo "no build"
           npx cap add ios || true
           npx cap copy ios
-      - name: Fix Icon 1024
+      - name: Icon
         script: |
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          mkdir -p "$ICONSET"
           if [ -f AppIcon.png ]; then
-            sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png"
-            sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png"
-            sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png"
-            echo "Icona blu installata"
+            mkdir -p "$ICONSET"
+            cp AppIcon.png "$ICONSET/AppIcon-1024.png"
+            sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
+            sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
           fi
       - name: Pods
         script: |
           cd ios/App && pod install
       - name: Build IPA
         script: |
-          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        auth: integration
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
