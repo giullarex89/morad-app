@@ -1,31 +1,103 @@
 workflows:
   ios-pwa:
     name: iOS PWA Build
+
     integrations:
       app_store_connect: Morad Admin
+
     instance_type: mac_mini_m2
     max_build_duration: 60
+
     environment:
       xcode: latest
       node: 20
       cocoapods: default
+
     scripts:
+
       - name: Setup Project
         script: |
-          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --force
-          mkdir -p dist && cp index.html dist/ 2>/dev/null || echo "<h1>App</h1>" > dist/index.html
-          echo '{"appId":"com.ouaid.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          rm -rf ios && npx cap add ios
-          cd ios/App && pod install --repo-update && cd ../..
-      - name: Create Signing - ORDINE GIUSTO
+          set -e
+
+          echo "=== Creating npm project ==="
+
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+          echo "=== Installing Capacitor ==="
+
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6
+
+          echo "=== Preparing web files ==="
+
+          mkdir -p dist
+
+          if [ -f index.html ]; then
+            cp index.html dist/index.html
+          else
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tolleranze Morad</title></head><body><h1>Tolleranze Morad</h1></body></html>' > dist/index.html
+          fi
+
+          echo "=== Creating Capacitor config ==="
+
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.ouaid.tolleranze",
+            "appName": "Tolleranze Morad",
+            "webDir": "dist"
+          }
+          EOF
+
+          echo "=== Creating iOS project ==="
+
+          rm -rf ios
+
+          npx cap add ios
+
+          echo "=== Installing CocoaPods ==="
+
+          cd ios/App
+          pod install
+          cd ../..
+
+          echo "=== Setup completed ==="
+
+      - name: Create Signing
         script: |
+          set -e
+
+          echo "=== Initializing keychain ==="
+
           keychain initialize
-          app-store-connect certificates create --type IOS_DISTRIBUTION --save || echo "cert exists"
-          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
+
+          echo "=== Fetching signing files ==="
+
+          app-store-connect fetch-signing-files \
+            com.ouaid.tolleranze \
+            --type IOS_APP_STORE \
+            --create
+
+          echo "=== Installing certificates ==="
+
           keychain add-certificates
+
+          echo "=== Applying signing profiles ==="
+
           xcode-project use-profiles
+
       - name: Build IPA
         script: |
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+          set -e
+
+          echo "=== Building IPA ==="
+
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
+
+          echo "=== IPA files ==="
+          find . -name "*.ipa" -print
+
     artifacts:
       - build/ios/ipa/*.ipa
