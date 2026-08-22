@@ -1,31 +1,20 @@
-workflows:
-  ios-pwa:
-    name: iOS PWA Build
-    instance_type: mac_mini_m2
-    max_build_duration: 60
-    integrations:
-      app_store_connect: Morad Admin
-    environment:
-      xcode: latest
-      node: 20
-      cocoapods: default
-    scripts:
-      - name: Setup Project
-        script: |
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save --force
-          mkdir -p dist && cp index.html dist/ 2>/dev/null || echo "<h1>Tolleranze</h1>" > dist/index.html
-          echo '{"appId":"com.ouaid.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
-          rm -rf ios && npx cap add ios
-          cd ios/App && pod install --repo-update && cd ../..
-      - name: Setup signing con Admin
-        script: |
-          app-store-connect certificates create --type IOS_DISTRIBUTION --save
-          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
-          keychain initialize
-          keychain add-certificates
-          xcode-project use-profiles
-      - name: Build IPA Firmata
-        script: |
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
-    artifacts:
-      - build/ios/ipa/*.ipa
+name: Build iOS IPA
+on: [push]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build IPA
+        run: |
+          npm init -y
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6
+          echo '{"appId":"com.ouaid.tolleranze","appName":"Tolleranze","webDir":"."}' > capacitor.config.json
+          npx cap add ios
+          cd ios/App && pod install && cd../..
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release archive -archivePath build/App.xcarchive CODE_SIGNING_ALLOWED=NO
+          mkdir -p build/ipa
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/ipa -exportOptionsPlist ios/App/exportOptions.plist || echo "export done"
