@@ -8,23 +8,28 @@ workflows:
       node: 20
       cocoapods: default
     scripts:
-      - name: Install
+      - name: Install dependencies
         script: |
-          npm install
-          npx cap add ios || true
-          npx cap copy ios
-      - name: Icon
+          npm install --force
+          npx --yes @capacitor/cli add ios || true
+          npx --yes @capacitor/cli copy ios || true
+          npx --yes @capacitor/cli sync ios || true
+      - name: Set App Icon
         script: |
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+          mkdir -p "$ICONSET"
           if [ -f AppIcon.png ]; then
-            mkdir -p "$ICONSET"
+            echo "Icona trovata"
             cp AppIcon.png "$ICONSET/AppIcon-1024.png"
             sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
             sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
+            sips -z 60 60 AppIcon.png --out "$ICONSET/AppIcon-60.png" || true
+          else
+            echo "AppIcon.png non trovata"
           fi
-      - name: Pods
+      - name: Install Pods
         script: |
-          cd ios/App && pod install
+          cd ios/App && pod install --repo-update
       - name: Build IPA
         script: |
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
