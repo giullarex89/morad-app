@@ -22,14 +22,14 @@ workflows:
           npx cap add ios
           npx cap sync ios
           cd ios/App && pod install --repo-update && cd ../..
-      - name: Automatic Code Signing
+      - name: Code Signing
         script: |
           keychain initialize
-          app-store-connect certificates create --type IOS_DISTRIBUTION --save || true
-          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "com.ouaid.tolleranze" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
-      - name: Build IPA Firmata
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+      - name: Build IPA
         script: |
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
