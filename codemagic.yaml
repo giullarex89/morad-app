@@ -11,6 +11,9 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --force
+          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
+            echo '{"appId":"com.morad.tolleranze","appName":"Tolleranze Morad","webDir":"dist","bundledWebRuntime":false}' > capacitor.config.json
+          fi
           npx --yes @capacitor/cli add ios || true
           npx --yes @capacitor/cli copy ios || true
           npx --yes @capacitor/cli sync ios || true
@@ -19,17 +22,23 @@ workflows:
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
           mkdir -p "$ICONSET"
           if [ -f AppIcon.png ]; then
-            echo "Icona trovata"
+            echo "Installo icona blu"
             cp AppIcon.png "$ICONSET/AppIcon-1024.png"
+            sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png" || true
             sips -z 180 180 AppIcon.png --out "$ICONSET/AppIcon-60@3x.png" || true
             sips -z 120 120 AppIcon.png --out "$ICONSET/AppIcon-60@2x.png" || true
             sips -z 60 60 AppIcon.png --out "$ICONSET/AppIcon-60.png" || true
+            ls -lh "$ICONSET"
           else
-            echo "AppIcon.png non trovata"
+            echo "AppIcon.png non trovata nella root"
           fi
       - name: Install Pods
         script: |
-          cd ios/App && pod install --repo-update
+          if [ -f ios/App/Podfile ]; then
+            cd ios/App && pod install --repo-update
+          else
+            echo "Nessun Podfile, continuo lo stesso"
+          fi
       - name: Build IPA
         script: |
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
