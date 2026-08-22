@@ -1,10 +1,10 @@
 workflows:
   ios-pwa:
     name: iOS PWA Build
+    integrations:
+      app_store_connect: Morad Admin
     instance_type: mac_mini_m2
     max_build_duration: 60
-    integrations:
-      app_store_connect: Morad API
     environment:
       xcode: latest
       node: 20
@@ -12,20 +12,19 @@ workflows:
     scripts:
       - name: Setup Project
         script: |
-          if [ ! -f package.json ]; then echo '{"name":"tolleranze","version":"1.0.0","private":true}' > package.json; fi
-          npm install --force
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --save
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/ios@6 --force
           mkdir -p dist && cp index.html dist/ 2>/dev/null || echo "<h1>App</h1>" > dist/index.html
           echo '{"appId":"com.ouaid.tolleranze","appName":"Tolleranze Morad","webDir":"dist"}' > capacitor.config.json
           rm -rf ios && npx cap add ios
           cd ios/App && pod install --repo-update && cd ../..
-      - name: Setup signing con Bundle GIUSTO
+      - name: Create Signing - ORDINE GIUSTO
         script: |
-          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
           keychain initialize
+          app-store-connect certificates create --type IOS_DISTRIBUTION --save || echo "cert exists"
+          app-store-connect fetch-signing-files com.ouaid.tolleranze --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
-      - name: Build IPA Firmata
+      - name: Build IPA
         script: |
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
