@@ -19,7 +19,7 @@ workflows:
       - name: Prepare Capacitor project
         script: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/ios
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7
 
           mkdir -p www
           cp index.html www/
