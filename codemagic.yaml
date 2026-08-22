@@ -1,14 +1,15 @@
 workflows:
-  ios-pwa:
+  ios-pwa-build:
     name: iOS PWA Build
-    instance_type: mac_mini_m2
     max_build_duration: 60
+    instance_type: mac_mini_m2
     environment:
       vars:
-        XCODE_WORKSPACE: "App/App.xcworkspace"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
-      xcode: latest
+        BUNDLE_ID: "com.morad.tolleranze"
       node: 20
+      xcode: latest
       cocoapods: default
     triggering:
       events:
@@ -17,29 +18,62 @@ workflows:
         - pattern: main
           include: true
     scripts:
-      - name: Install Capacitor
+      - name: Install dependencies
         script: |
-          npm i -g @capacitor/cli
-          npm init -y || true
-          npm install @capacitor/core @capacitor/ios
-          npx cap init "Tolleranze" "com.morad.tolleranze" --web-dir="." || true
-          npx cap add ios || true
-          # crea config che punta al tuo sito
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.morad.tolleranze",
-            "appName": "Tolleranze",
-            "webDir": ".",
-            "server": {
-              "url": "https://giullarex89.github.io/morad-app/",
-              "cleartext": true
-            }
-          }
-          EOF
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/ios --save
+          
+      - name: Build PWA web
+        script: |
+          npm run build || npx vite build || echo "No build script, uso root"
+          
+      - name: Add iOS platform
+        script: |
+          npx cap add ios || echo "ios gia presente"
           npx cap copy ios
-      - name: Set up code signing
+          
+      - name: Aggiungi Icona 1024 App Store
         script: |
-          echo $APP_STORE_CONNECT_API_KEY > AuthKey.p8
+          echo "Cerco AppIcon.png..."
+          ls -lh | grep -i icon || echo "Nessuna icona in root"
+          if [ -f "AppIcon.png" ]; then
+            echo "Trovata AppIcon.png, la copio..."
+            ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+            mkdir -p "$ICONSET"
+            # 1024 per App Store
+            sips -z 1024 1024 AppIcon.png --out "$ICONSET/AppIcon-1024.png"
+            # Altre misure per device
+            sips -z 20 20 AppIcon.png --out "$ICONSET/AppIcon-20.png"
+            sips -z 29 29 AppIcon.png --out "$ICONSET/AppIcon-29.png"
+            sips -z 40 40 AppIcon.png --out "$ICONSET/AppIcon-40.png"
+            sips -z 60 60 AppIcon.png --out "$ICONSET/AppIcon-60.png"
+            sips -z 76 76 AppIcon.png --out "$ICONSET/AppIcon-76.png"
+            sips -z 152 152 AppIcon.png --out "$ICONSET/AppIcon-152.png"
+            sips -z 167 167 AppIcon.png --out "$ICONSET/AppIcon-167.png"
+            echo "Icone generate!"
+            ls -lh "$ICONSET"
+          else
+            echo "ATTENZIONE: AppIcon.png non trovata! Usera icona default."
+          fi
+          
+      - name: Set up provisioning
+        script: |
+          cd ios/App
+          pod install
+          
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
     artifacts:
-      - App/build/*.ipa
-      - ios/App/build/*.ipa
+      - build/ios/ipa/*.ipa
+      - ios/App/App/Assets.xcassets/AppIcon.appiconset/
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        beta_groups:
+          - Beta Testers
