@@ -91,9 +91,10 @@ workflows:
 
           echo "Fix icona fatto! Ora è solo iPhone."
 
-      - name: FIX BUILD NUMBER
+      - name: FIX BUILD NUMBER E VERSION
         script: |
           cd ios/App
+          agvtool new-marketing-version 1.1
           agvtool new-version -all $BUILD_NUMBER
 
       - name: Install CocoaPods
