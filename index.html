@@ -7,51 +7,244 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="./icon-1024.png">
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calcolatore Accoppiamenti ISO 286 V2</title>
+<title id="pageTitle">Calcolatore Accoppiamenti ISO 286 V2</title>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--card2:#020617;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--blue:#38bdf8;--pink:#f472b6}
-*{box-sizing:border-box}body{margin:0;padding:12px;font-family:Arial;background:var(--bg);color:var(--text)}.app{max-width:900px;margin:auto}.card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border)}h1{margin:0;text-align:center;color:var(--blue);font-size:22px}.sub{text-align:center;color:var(--muted);font-size:12px;margin:8px 0 18px}label{display:block;margin-top:12px;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:bold}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:16px;font-weight:bold}button{width:100%;padding:15px;margin-top:16px;border:none;border-radius:12px;cursor:pointer;font-weight:900;font-size:15px;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#020617}.result{margin-top:16px;padding:16px;border-radius:14px;background:var(--card2);border:1px solid var(--border)}.error{color:#fca5a5;font-weight:bold;line-height:1.5}.success{color:#bbf7d0}table{width:100%;border-collapse:collapse;margin-top:8px}th{color:var(--muted);font-size:10px;text-align:left;padding:8px 4px}td{padding:8px 4px;border-bottom:1px solid #1e293b}.val-blue{color:var(--blue);font-weight:800}.val-pink{color:var(--pink);font-weight:800}.summary{margin-top:14px;padding:12px;background:#0f172a;border-radius:10px;line-height:1.8;font-size:14px}.badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900;margin-top:8px}.badge.play{background:#14532d;color:#bbf7d0}.badge.trans{background:#713f12;color:#fde68a}.badge.inter{background:#7f1d1d;color:#fecaca}canvas{width:100%;display:block;margin-top:16px;background:#fff;border-radius:12px}.note{margin-top:15px;padding:12px;border-radius:10px;background:#172033;color:var(--muted);font-size:11px;line-height:1.5}
+*{box-sizing:border-box}body{margin:0;padding:12px;font-family:Arial;background:var(--bg);color:var(--text)}.app{max-width:900px;margin:auto}.card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border)}.header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}h1{margin:0;color:var(--blue);font-size:22px;flex:1}.lang-selector{display:flex;gap:6px;background:var(--card2);padding:4px;border-radius:12px;border:1px solid var(--border)}.lang-btn{background:transparent;border:none;color:var(--muted);padding:6px 12px;border-radius:8px;font-weight:bold;font-size:13px;cursor:pointer}.lang-btn.active{background:var(--blue);color:#020617}.sub{text-align:center;color:var(--muted);font-size:12px;margin:8px 0 18px}label{display:block;margin-top:12px;margin-bottom:5px;color:var(--muted);font-size:11px;font-weight:bold}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:16px;font-weight:bold}button{width:100%;padding:15px;margin-top:16px;border:none;border-radius:12px;cursor:pointer;font-weight:900;font-size:15px;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#020617}.result{margin-top:16px;padding:16px;border-radius:14px;background:var(--card2);border:1px solid var(--border)}.error{color:#fca5a5;font-weight:bold;line-height:1.5}.success{color:#bbf7d0}table{width:100%;border-collapse:collapse;margin-top:8px}th{color:var(--muted);font-size:10px;text-align:left;padding:8px 4px}td{padding:8px 4px;border-bottom:1px solid #1e293b}.val-blue{color:var(--blue);font-weight:800}.val-pink{color:var(--pink);font-weight:800}.summary{margin-top:14px;padding:12px;background:#0f172a;border-radius:10px;line-height:1.8;font-size:14px}.badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:900;margin-top:8px}.badge.play{background:#14532d;color:#bbf7d0}.badge.trans{background:#713f12;color:#fde68a}.badge.inter{background:#7f1d1d;color:#fecaca}canvas{width:100%;display:block;margin-top:16px;background:#fff;border-radius:12px}.note{margin-top:15px;padding:12px;border-radius:10px;background:#172033;color:var(--muted);font-size:11px;line-height:1.5}
 </style>
 </head>
- <script>
+<script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
 </script>
 <body>
 <div class="app"><div class="card">
-<h1>⚙ CALCOLATORE ACCOPPIAMENTI ISO 286 V2</h1>
-<div class="sub">ISO 286-1:2010 / ISO 286-2:2010 - Con tabelle J/j complete<br>Validato 250 J6/j6 = tuo Excel</div>
-<label>DIAMETRO NOMINALE (mm)</label><input id="D" type="number" min="0.001" max="3150" step="0.001" value="250">
-<div class="row"><div><label>FORO - POSIZIONE</label><select id="holeLetter"></select></div><div><label>FORO - GRADO IT</label><select id="holeGrade"></select></div></div>
-<div class="row"><div><label>ALBERO - POSIZIONE</label><select id="shaftLetter"></select></div><div><label>ALBERO - GRADO IT</label><select id="shaftGrade"></select></div></div>
+<div class="header">
+<h1 id="mainTitle">⚙ CALCOLATORE ACCOPPIAMENTI ISO 286 V2</h1>
+<div class="lang-selector">
+<button class="lang-btn active" data-lang="it">IT</button>
+<button class="lang-btn" data-lang="en">EN</button>
+<button class="lang-btn" data-lang="de">DE</button>
+</div>
+</div>
+<div class="sub" id="subTitle">ISO 286-1:2010 / ISO 286-2:2010 - Con tabelle J/j complete<br>Validato 250 J6/j6 = tuo Excel</div>
+<label id="labelDiameter">DIAMETRO NOMINALE (mm)</label>
+<input id="D" type="number" min="0.001" max="3150" step="0.001" value="250">
+<div class="row">
+<div><label id="labelHolePos">FORO - POSIZIONE</label><select id="holeLetter"></select></div>
+<div><label id="labelHoleGrade">FORO - GRADO IT</label><select id="holeGrade"></select></div>
+</div>
+<div class="row">
+<div><label id="labelShaftPos">ALBERO - POSIZIONE</label><select id="shaftLetter"></select></div>
+<div><label id="labelShaftGrade">ALBERO - GRADO IT</label><select id="shaftGrade"></select></div>
+</div>
 <button id="calcBtn">CALCOLA ACCOPPIAMENTO</button>
 <div id="output" class="result">Inserisci i dati e premi CALCOLA.</div>
 <canvas id="canvas" width="800" height="360"></canvas>
-<div class="note"><strong>V2 - Sicurezza metrologica:</strong> IT01-IT18 da tabelle ufficiali ISO 286-2. J/j implementati da tabelle 2-32. Se combinazione non tabulata, il programma blocca invece di inventare.</div>
+<div class="note" id="noteFooter"><strong>V2 - Sicurezza metrologica:</strong> IT01-IT18 da tabelle ufficiali ISO 286-2. J/j implementati da tabelle 2-32. Se combinazione non tabulata, il programma blocca invece di inventare.</div>
 </div></div>
 <script>
+// ============================================================
+// LOCALIZZAZIONE - FIX APPLICATI
+// ============================================================
+const translations = {
+  it: {
+    mainTitle: "⚙ CALCOLATORE ACCOPPIAMENTI ISO 286 V2",
+    subTitle: "ISO 286-1:2010 / ISO 286-2:2010 - Con tabelle J/j complete<br>Validato 250 J6/j6 = tuo Excel",
+    labelDiameter: "DIAMETRO NOMINALE (mm)",
+    labelHolePos: "FORO - POSIZIONE",
+    labelHoleGrade: "FORO - GRADO IT",
+    labelShaftPos: "ALBERO - POSIZIONE",
+    labelShaftGrade: "ALBERO - GRADO IT",
+    calcBtn: "CALCOLA ACCOPPIAMENTO",
+    resultDefault: "Inserisci i dati e premi CALCOLA.",
+    noteFooter: "<strong>V2 - Sicurezza metrologica:</strong> IT01-IT18 da tabelle ufficiali ISO 286-2. J/j implementati da tabelle 2-32. Se combinazione non tabulata, il programma blocca invece di inventare.",
+    fit_clearance: "ACCOPPIAMENTO CON GIOCO",
+    fit_interference: "ACCOPPIAMENTO CON INTERFERENZA",
+    fit_transition: "ACCOPPIAMENTO DI TRANSIZIONE (INCERTO)",
+    hole: "FORO",
+    shaft: "ALBERO",
+    limit_sup: "Limite sup.",
+    limit_inf: "Limite inf.",
+    dev_sup: "Scost. sup.",
+    dev_inf: "Scost. inf.",
+    max_clearance: "Gioco max",
+    min_clearance: "Gioco min",
+    max_interference: "Interf. max",
+    calc_error: "CALCOLO NON ESEGUITO",
+    diam_out: "Diametro fuori campo 0-3150mm",
+    grade_not_recognized: "Grado IT non riconosciuto",
+    grade_not_available: "non disponibile per questo diametro",
+    deviation_not_implemented: "Scostamento non implementato",
+    deviation_not_available: "non disponibile per D=",
+    not_tabulated: "non tabulato ISO 286-2 per Ø",
+    interval: "intervallo",
+    hole_not_implemented: "Foro non implementato"
+  },
+  en: {
+    mainTitle: "⚙ ISO 286 FITS CALCULATOR V2",
+    subTitle: "ISO 286-1:2010 / ISO 286-2:2010 - Complete J/j tables<br>Validated 250 J6/j6 = your Excel",
+    labelDiameter: "NOMINAL DIAMETER (mm)",
+    labelHolePos: "HOLE - POSITION",
+    labelHoleGrade: "HOLE - IT GRADE",
+    labelShaftPos: "SHAFT - POSITION",
+    labelShaftGrade: "SHAFT - IT GRADE",
+    calcBtn: "CALCULATE FIT",
+    resultDefault: "Enter data and press CALCULATE.",
+    noteFooter: "<strong>V2 - Metrological safety:</strong> IT01-IT18 from official ISO 286-2 tables. J/j implemented from tables 2-32. If combination is not tabulated, program blocks instead of inventing.",
+    fit_clearance: "CLEARANCE FIT",
+    fit_interference: "INTERFERENCE FIT",
+    fit_transition: "TRANSITION FIT (UNCERTAIN)",
+    hole: "HOLE",
+    shaft: "SHAFT",
+    limit_sup: "Upper limit",
+    limit_inf: "Lower limit",
+    dev_sup: "Upper dev.",
+    dev_inf: "Lower dev.",
+    max_clearance: "Max clearance",
+    min_clearance: "Min clearance",
+    max_interference: "Max interference",
+    calc_error: "CALCULATION FAILED",
+    diam_out: "Diameter out of range 0-3150mm",
+    grade_not_recognized: "IT grade not recognized",
+    grade_not_available: "not available for this diameter",
+    deviation_not_implemented: "Deviation not implemented",
+    deviation_not_available: "not available for D=",
+    not_tabulated: "not tabulated ISO 286-2 for Ø",
+    interval: "range",
+    hole_not_implemented: "Hole not implemented"
+  },
+  de: {
+    mainTitle: "⚙ ISO 286 PASSUNGEN RECHNER V2",
+    subTitle: "ISO 286-1:2010 / ISO 286-2:2010 - Vollständige J/j-Tabellen<br>Validierte 250 J6/j6 = Ihr Excel",
+    labelDiameter: "NENNDURCHMESSER (mm)",
+    labelHolePos: "BOHRUNG - POSITION",
+    labelHoleGrade: "BOHRUNG - IT-KLASSE",
+    labelShaftPos: "WELLE - POSITION",
+    labelShaftGrade: "WELLE - IT-KLASSE",
+    calcBtn: "PASSUNG BERECHNEN",
+    resultDefault: "Daten eingeben und BERECHNEN drücken.",
+    noteFooter: "<strong>V2 - Metrologische Sicherheit:</strong> IT01-IT18 aus offiziellen ISO 286-2 Tabellen. J/j aus Tabellen 2-32 implementiert. Wenn Kombination nicht tabelliert ist, blockiert das Programm statt zu erfinden.",
+    fit_clearance: "SPIELPASSUNG",
+    fit_interference: "ÜBERMASS PASSUNG",
+    fit_transition: "ÜBERGANGSPASSUNG (UNSICHER)",
+    hole: "BOHRUNG",
+    shaft: "WELLE",
+    limit_sup: "Obergrenze",
+    limit_inf: "Untergrenze",
+    dev_sup: "Oberes Abmaß",
+    dev_inf: "Unteres Abmaß",
+    max_clearance: "Max. Spiel",
+    min_clearance: "Min. Spiel",
+    max_interference: "Max. Übermaß",
+    calc_error: "BERECHNUNG FEHLGESCHLAGEN",
+    diam_out: "Durchmesser außerhalb 0-3150mm",
+    grade_not_recognized: "IT-Klasse nicht erkannt",
+    grade_not_available: "für diesen Durchmesser nicht verfügbar",
+    deviation_not_implemented: "Abmaß nicht implementiert",
+    deviation_not_available: "nicht verfügbar für D=",
+    not_tabulated: "nicht tabelliert ISO 286-2 für Ø",
+    interval: "Bereich",
+    hole_not_implemented: "Bohrung nicht implementiert"
+  }
+};
+let currentLang = 'it';
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  const t = translations[lang] || translations.it;
+  document.getElementById('mainTitle').textContent = t.mainTitle;
+  document.getElementById('subTitle').innerHTML = t.subTitle;
+  document.getElementById('labelDiameter').textContent = t.labelDiameter;
+  document.getElementById('labelHolePos').textContent = t.labelHolePos;
+  document.getElementById('labelHoleGrade').textContent = t.labelHoleGrade;
+  document.getElementById('labelShaftPos').textContent = t.labelShaftPos;
+  document.getElementById('labelShaftGrade').textContent = t.labelShaftGrade;
+  document.getElementById('calcBtn').textContent = t.calcBtn;
+  document.getElementById('noteFooter').innerHTML = t.noteFooter;
+  document.getElementById('pageTitle').textContent = t.mainTitle.replace(/[^a-zA-Z0-9 ]/g,'').trim();
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  if (typeof calculate === 'function') calculate();
+}
+const savedLang = localStorage.getItem('lang');
+let detectedLang = 'it';
+if (savedLang && translations[savedLang]) {
+  detectedLang = savedLang;
+} else {
+  const browserLang = navigator.language || navigator.userLanguage;
+  if (browserLang.startsWith('en')) detectedLang = 'en';
+  else if (browserLang.startsWith('de')) detectedLang = 'de';
+}
+setLanguage(detectedLang);
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    setLanguage(this.dataset.lang);
+  });
+});
+// ============================================================
+// LOGICA CALCOLATORE ORIGINALE - INVARIATA
+// ============================================================
 const holeLetters=["A","B","C","CD","D","E","EF","F","FG","G","H","JS","J","K","M","N","P","R","S","T","U","V","X","Y","Z","ZA","ZB","ZC"];
 const shaftLetters=["a","b","c","cd","d","e","ef","f","fg","g","h","js","j","k","m","n","p","r","s","t","u","v","x","y","z","za","zb","zc"];
 const grades=["01","0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18"];
 const sizeSteps=[[0,3],[3,6],[6,10],[10,18],[18,30],[30,50],[50,80],[80,120],[120,180],[180,250],[250,315],[315,400],[400,500],[500,630],[630,800],[800,1000],[1000,1250],[1250,1600],[1600,2000],[2000,2500],[2500,3150]];
 const IT_TABLE={"01":[0.3,0.4,0.4,0.5,0.6,0.7,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.5,5.0],"0":[0.5,0.6,0.6,0.8,1.0,1.2,1.4,1.6,2.0,2.3,2.6,2.9,3.2,3.6,4.0,4.5,5.0,5.6,6.3,7.0,8.0],"1":[0.8,1.0,1.0,1.2,1.5,1.8,2.2,2.5,3.0,3.5,4.0,4.5,5.0,5.6,6.3,7.0,8.0,9.0,10,11,13],"2":[1.2,1.5,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,13,15,17,19,22,25],"3":[2,2.5,2.5,3,4,5,6,7,8,10,12,14,16,18,20,23,26,30,34,38,44],"4":[3,4,4,5,6,8,10,12,14,18,20,23,27,32,36,40,46,52,60,68,78],"5":[4,5,6,8,9,11,13,15,18,20,23,27,32,36,40,46,52,60,68,78,88],"6":[6,8,9,11,13,16,19,22,25,29,32,36,40,44,50,56,64,72,80,92,105],"7":[10,12,15,18,21,25,30,35,40,46,52,57,63,70,80,90,100,110,120,140,160],"8":[14,18,22,27,33,39,46,54,63,72,81,89,97,110,125,140,160,180,200,230,260],"9":[25,30,36,43,52,62,74,87,100,115,130,140,155,175,200,230,250,290,320,360,410],"10":[40,48,58,70,84,100,120,140,160,185,210,230,250,290,320,360,400,460,520,600,680],"11":[60,75,90,110,130,160,190,220,250,290,320,360,400,460,520,600,700,800,900,1050,1200],"12":[100,120,150,180,210,250,300,350,400,460,520,570,630,700,800,900,1000,1100,1300,1500,1700],"13":[140,180,220,270,330,390,460,540,630,720,810,890,970,1100,1250,1400,1600,1800,2000,2300,2600],"14":[250,300,360,430,520,620,740,870,1000,1150,1300,1400,1550,1750,2000,2300,2500,2900,3200,3600,4100],"15":[400,480,580,700,840,1000,1200,1400,1600,1850,2100,2300,2500,2900,3200,3600,4000,4600,5200,6000,6800],"16":[600,750,900,1100,1300,1600,1900,2200,2500,2900,3200,3600,4000,4600,5200,6000,7000,8000,9000,10500,12000],"17":[1000,1200,1500,1800,2100,2500,3000,3500,4000,4600,5200,5700,6300,7000,8000,9000,10000,11000,13000,15000,17000],"18":[1400,1800,2200,2700,3300,3900,4600,5400,6300,7200,8100,8900,9700,11000,12500,14000,16000,18000,20000,23000,26000]};
 const shaftFundamental={"h":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"g":[-2,-4,-5,-6,-7,-9,-10,-12,-14,-15,-16,-18,-20,-22,-25,-28,-32,-36,-40,-45,-50],"f":[-6,-10,-13,-16,-20,-25,-30,-36,-43,-50,-56,-62,-68,-80,-90,-100,-110,-120,-140,-160,-180],"e":[-14,-20,-25,-32,-40,-50,-60,-72,-85,-100,-110,-125,-140,-160,-180,-200,-220,-240,-280,-320,-360],"d":[-20,-30,-40,-50,-65,-80,-100,-120,-145,-170,-190,-210,-230,-260,-300,-340,-380,-420,-480,-540,-600],"c":[-60,-70,-80,-95,-110,-130,-150,-170,-180,-200,-230,-260,-290,-320,-360,-400,-450,-500,-560,-620,-700],"b":[-140,-140,-150,-150,-160,-180,-200,-220,-240,-260,-280,-310,-340,-380,-420,-460,-520,-580,-640,-700,-800],"a":[-270,-270,-280,-290,-300,-320,-360,-380,-430,-480,-520,-570,-630,-700,-780,-860,-960,-1060,-1180,-1300,-1450],"k":[0,1,1,1,2,2,2,3,4,4,4,5,5,5,6,7,8,9,10,11,13],"m":[2,4,6,8,8,9,11,13,15,17,20,21,23,25,27,30,34,38,43,48,55],"n":[4,8,10,12,15,17,20,23,27,31,34,37,40,43,50,56,64,72,80,88,100],"p":[6,12,15,18,22,26,32,37,43,50,56,62,68,70,80,88,100,112,125,140,155],"r":[10,15,19,23,28,34,43,63,68,75,85,94,110,120,130,145,160,180,200,220,250],"s":[14,19,23,28,35,43,59,79,92,100,110,125,140,155,170,190,210,230,260,290,320]};
-// TABELLE J/j UFFICIALI ISO 286-2 - validate con tuo Excel 250 J6/j6
 const holeJ_Table={0:{"6":[3,-3],"7":[5,-5],"8":[8,-6]},1:{"6":[5,-3],"7":[8,-4],"8":[12,-6]},2:{"6":[5,-4],"7":[8,-7],"8":[14,-8]},3:{"6":[6,-5],"7":[10,-8],"8":[18,-9]},4:{"6":[8,-5],"7":[12,-9],"8":[20,-13]},5:{"6":[10,-6],"7":[14,-11],"8":[24,-15]},6:{"6":[13,-6],"7":[18,-12],"8":[28,-18]},7:{"6":[16,-6],"7":[22,-13],"8":[34,-20]},8:{"6":[18,-7],"7":[26,-14],"8":[41,-22]},9:{"6":[22,-7],"7":[30,-16],"8":[47,-25]},10:{"6":[25,-7],"7":[36,-16],"8":[55,-27]},11:{"6":[28,-8],"7":[41,-16],"8":[63,-29]},12:{"6":[32,-9],"7":[47,-18],"8":[72,-32]},13:{"6":[40,-10],"7":[55,-20]},14:{"6":[45,-11]},15:{"6":[50,-12]},16:{},17:{},18:{},19:{},20:{}};
 const shaftJ_Table={0:{"5":[3,-1],"6":[4,-2],"7":[6,-4],"8":[8,-6]},1:{"5":[4,-1],"6":[6,-2],"7":[8,-4],"8":[12,-6]},2:{"5":[5,-1],"6":[7,-2],"7":[10,-5],"8":[14,-8]},3:{"5":[6,-2],"6":[8,-3],"7":[12,-6],"8":[18,-9]},4:{"5":[7,-2],"6":[10,-3],"7":[14,-7],"8":[20,-13]},5:{"5":[8,-2],"6":[12,-4],"7":[18,-7],"8":[24,-15]},6:{"5":[9,-3],"6":[13,-6],"7":[21,-9],"8":[28,-18]},7:{"5":[10,-4],"6":[15,-7],"7":[24,-11],"8":[34,-20]},8:{"5":[11,-5],"6":[18,-7],"7":[28,-12],"8":[41,-22]},9:{"5":[12,-6],"6":[16,-13],"7":[30,-16],"8":[47,-25]},10:{"5":[13,-7],"6":[20,-12],"7":[36,-16],"8":[55,-27]},11:{"5":[15,-8],"6":[22,-14],"7":[41,-16]},12:{"5":[17,-9],"6":[25,-15]},13:{},14:{},15:{},16:{},17:{},18:{},19:{},20:{}};
 function getStepIndex(D){if(!Number.isFinite(D)||D<=0||D>3150)return -1;for(let i=0;i<sizeSteps.length;i++){const[low,high]=sizeSteps[i];if(i===0){if(D>0&&D<=high)return i}else{if(D>low&&D<=high)return i}}return -1}
-function getIT(D,grade){const index=getStepIndex(D);if(index<0)throw new Error("Diametro fuori campo 0-3150mm");const values=IT_TABLE[grade];if(!values)throw new Error("Grado IT non riconosciuto");const v=values[index];if(v==null)throw new Error(`IT${grade} non disponibile per questo diametro`);return v}
-function getShaftDeviation(l,D){const i=getStepIndex(D);const v=shaftFundamental[l];if(!v)throw new Error(`Scostamento ${l} non implementato`);const val=v[i];if(val==null)throw new Error(`Scostamento ${l} non disponibile per D=${D}`);return val}
-function calculateShaft(letter,grade,D){const IT=getIT(D,grade);const idx=getStepIndex(D);if(letter==="js"){return{es:IT/2,ei:-IT/2,IT}}if(letter==="j"){const t=shaftJ_Table[idx];if(!t||!t[grade])throw new Error(`j${grade} non tabulato ISO 286-2 per Ø ${D} (intervallo ${sizeSteps[idx][0]}-${sizeSteps[idx][1]})`);const [es,ei]=t[grade];return{es,ei,IT:es-ei}}const fund=getShaftDeviation(letter,D);let es,ei;if(["a","b","c","cd","d","e","ef","f","fg","g","h"].includes(letter)){es=fund;ei=es-IT}else{ei=fund;es=ei+IT}return{es,ei,IT}}
-function calculateHole(letter,grade,D){const IT=getIT(D,grade);const idx=getStepIndex(D);if(letter==="H")return{ES:IT,EI:0,IT};if(letter==="JS")return{ES:IT/2,EI:-IT/2,IT};if(letter==="J"){const t=holeJ_Table[idx];if(!t||!t[grade])throw new Error(`J${grade} non tabulato ISO 286-2 per Ø ${D} (intervallo ${sizeSteps[idx][0]}-${sizeSteps[idx][1]})`);const [ES,EI]=t[grade];return{ES,EI,IT:ES-EI}}const low=letter.toLowerCase();if(!shaftFundamental[low]&&low!=="js"&&low!=="j")throw new Error(`Foro ${letter} non implementato`);const shaft=calculateShaft(low,grade,D);let ES,EI;if(["A","B","C","CD","D","E","EF","F","FG","G"].includes(letter)){ES=-shaft.ei;EI=-shaft.es}else{EI=-shaft.ei;ES=EI+IT}return{ES,EI,IT}}
+function getIT(D,grade){const index=getStepIndex(D);if(index<0)throw new Error(translations[currentLang].diam_out);const values=IT_TABLE[grade];if(!values)throw new Error(translations[currentLang].grade_not_recognized);const v=values[index];if(v==null)throw new Error(`IT${grade} ${translations[currentLang].grade_not_available}`);return v}
+function getShaftDeviation(l,D){const i=getStepIndex(D);const v=shaftFundamental[l];if(!v)throw new Error(translations[currentLang].deviation_not_implemented);const val=v[i];if(val==null)throw new Error(`${translations[currentLang].deviation_not_available}${D}`);return val}
+function calculateShaft(letter,grade,D){const IT=getIT(D,grade);const idx=getStepIndex(D);if(letter==="js"){return{es:IT/2,ei:-IT/2,IT}}if(letter==="j"){const t=shaftJ_Table[idx];if(!t||!t[grade])throw new Error(`j${grade} ${translations[currentLang].not_tabulated} ${D} (${translations[currentLang].interval} ${sizeSteps[idx][0]}-${sizeSteps[idx][1]})`);const [es,ei]=t[grade];return{es,ei,IT:es-ei}}const fund=getShaftDeviation(letter,D);let es,ei;if(["a","b","c","cd","d","e","ef","f","fg","g","h"].includes(letter)){es=fund;ei=es-IT}else{ei=fund;es=ei+IT}return{es,ei,IT}}
+function calculateHole(letter,grade,D){const IT=getIT(D,grade);const idx=getStepIndex(D);if(letter==="H")return{ES:IT,EI:0,IT};if(letter==="JS")return{ES:IT/2,EI:-IT/2,IT};if(letter==="J"){const t=holeJ_Table[idx];if(!t||!t[grade])throw new Error(`J${grade} ${translations[currentLang].not_tabulated} ${D} (${translations[currentLang].interval} ${sizeSteps[idx][0]}-${sizeSteps[idx][1]})`);const [ES,EI]=t[grade];return{ES,EI,IT:ES-EI}}const low=letter.toLowerCase();if(!shaftFundamental[low]&&low!=="js"&&low!=="j")throw new Error(`${translations[currentLang].hole_not_implemented}: ${letter}`);const shaft=calculateShaft(low,grade,D);let ES,EI;if(["A","B","C","CD","D","E","EF","F","FG","G"].includes(letter)){ES=-shaft.ei;EI=-shaft.es}else{EI=-shaft.ei;ES=EI+IT}return{ES,EI,IT}}
 function mm(v){return Number(v).toFixed(3)}function signedMicron(v){const s=v>0?"+":v<0?"−":"";return s+Math.abs(v).toFixed(1)+" µm"}
-function calculate(){const D=Number(document.getElementById("D").value);const hl=document.getElementById("holeLetter").value;const hg=document.getElementById("holeGrade").value;const sl=document.getElementById("shaftLetter").value;const sg=document.getElementById("shaftGrade").value;const out=document.getElementById("output");try{const hole=calculateHole(hl,hg,D);const shaft=calculateShaft(sl,sg,D);const hMax=D+Math.max(hole.ES,hole.EI)/1000;const hMin=D+Math.min(hole.ES,hole.EI)/1000;const sMax=D+Math.max(shaft.es,shaft.ei)/1000;const sMin=D+Math.min(shaft.es,shaft.ei)/1000;const maxC=hMax-sMin;const minC=hMin-sMax;let fit,badge;if(minC>=0){fit="ACCOPPIAMENTO CON GIOCO";badge="play"}else if(maxC<=0){fit="ACCOPPIAMENTO CON INTERFERENZA";badge="inter"}else{fit="ACCOPPIAMENTO DI TRANSIZIONE (INCERTO)";badge="trans"}out.innerHTML=`<div class="success"><strong>Ø ${D} ${hl}${hg}/${sl}${sg}</strong></div><table><tr><th></th><th>FORO ${hl}${hg}</th><th>ALBERO ${sl}${sg}</th></tr><tr><td>Limite sup.</td><td class="val-blue">${mm(hMax)} mm</td><td class="val-blue">${mm(sMax)} mm</td></tr><tr><td>Limite inf.</td><td class="val-pink">${mm(hMin)} mm</td><td class="val-pink">${mm(sMin)} mm</td></tr><tr><td>Scost. sup.</td><td>${signedMicron(hole.ES)}</td><td>${signedMicron(shaft.es)}</td></tr><tr><td>Scost. inf.</td><td>${signedMicron(hole.EI)}</td><td>${signedMicron(shaft.ei)}</td></tr><tr><td>IT</td><td>${hole.IT} µm</td><td>${shaft.IT} µm</td></tr></table><div class="summary"><strong>Gioco max:</strong> ${maxC>=0?"+":""}${mm(maxC)} mm<br><strong>Gioco min:</strong> ${minC>=0?"+":""}${mm(minC)} mm<br><strong>Interf. max:</strong> ${maxC<0?mm(Math.abs(minC)):"0.000"} mm<br><span class="badge ${badge}">${fit}</span></div>`;drawChart(hole,shaft)}catch(e){out.innerHTML=`<div class="error"><strong>CALCOLO NON ESEGUITO</strong><br><br>${e.message}<br><br>Il programma interrompe il calcolo perché non usa valori sostitutivi.</div>`;clearCanvas()}}
+function calculate(){
+const D=Number(document.getElementById("D").value);
+const hl=document.getElementById("holeLetter").value;
+const hg=document.getElementById("holeGrade").value;
+const sl=document.getElementById("shaftLetter").value;
+const sg=document.getElementById("shaftGrade").value;
+const out=document.getElementById("output");
+const t=translations[currentLang];
+try{
+const hole=calculateHole(hl,hg,D);
+const shaft=calculateShaft(sl,sg,D);
+const hMax=D+Math.max(hole.ES,hole.EI)/1000;
+const hMin=D+Math.min(hole.ES,hole.EI)/1000;
+const sMax=D+Math.max(shaft.es,shaft.ei)/1000;
+const sMin=D+Math.min(shaft.es,shaft.ei)/1000;
+const maxC=hMax-sMin;
+const minC=hMin-sMax;
+let fit,badge;
+if(minC>=0){fit=t.fit_clearance;badge="play"}else if(maxC<=0){fit=t.fit_interference;badge="inter"}else{fit=t.fit_transition;badge="trans"}
+out.innerHTML=`<div class="success"><strong>Ø ${D} ${hl}${hg}/${sl}${sg}</strong></div>
+<table><tr><th></th><th>${t.hole} ${hl}${hg}</th><th>${t.shaft} ${sl}${sg}</th></tr>
+<tr><td>${t.limit_sup}</td><td class="val-blue">${mm(hMax)} mm</td><td class="val-blue">${mm(sMax)} mm</td></tr>
+<tr><td>${t.limit_inf}</td><td class="val-pink">${mm(hMin)} mm</td><td class="val-pink">${mm(sMin)} mm</td></tr>
+<tr><td>${t.dev_sup}</td><td>${signedMicron(hole.ES)}</td><td>${signedMicron(shaft.es)}</td></tr>
+<tr><td>${t.dev_inf}</td><td>${signedMicron(hole.EI)}</td><td>${signedMicron(shaft.ei)}</td></tr>
+<tr><td>IT</td><td>${hole.IT} µm</td><td>${shaft.IT} µm</td></tr></table>
+<div class="summary"><strong>${t.max_clearance}:</strong> ${maxC>=0?"+":""}${mm(maxC)} mm<br>
+<strong>${t.min_clearance}:</strong> ${minC>=0?"+":""}${mm(minC)} mm<br>
+<strong>${t.max_interference}:</strong> ${maxC<0?mm(Math.abs(minC)):"0.000"} mm<br>
+<span class="badge ${badge}">${fit}</span></div>`;
+drawChart(hole,shaft);
+}catch(e){
+out.innerHTML=`<div class="error"><strong>${t.calc_error}</strong><br><br>${e.message}<br><br>Il programma interrompe il calcolo perché non usa valori sostitutivi.</div>`;
+clearCanvas();
+}
+}
 function clearCanvas(){const c=document.getElementById("canvas");const x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height)}
-function drawChart(hole,shaft){const c=document.getElementById("canvas");const x=c.getContext("2d");const W=c.width,H=c.height;x.clearRect(0,0,W,H);x.fillStyle="#fff";x.fillRect(0,0,W,H);const cy=H/2;const maxAbs=Math.max(...[hole.ES,hole.EI,shaft.es,shaft.ei].map(Math.abs),10);const sc=120/maxAbs;x.strokeStyle="#94a3b8";x.setLineDash([6,6]);x.beginPath();x.moveTo(30,cy);x.lineTo(W-30,cy);x.stroke();x.setLineDash([]);x.fillStyle="#475569";x.font="14px Arial";x.fillText("Linea zero",20,cy-8);const hY1=cy-hole.ES*sc,hY2=cy-hole.EI*sc;x.fillStyle="rgba(56,189,248,0.25)";x.fillRect(110,Math.min(hY1,hY2),220,Math.max(2,Math.abs(hY1-hY2)));x.strokeStyle="#0284c7";x.strokeRect(110,Math.min(hY1,hY2),220,Math.max(2,Math.abs(hY1-hY2)));const sY1=cy-shaft.es*sc,sY2=cy-shaft.ei*sc;x.fillStyle="rgba(239,68,68,0.25)";x.fillRect(470,Math.min(sY1,sY2),220,Math.max(2,Math.abs(sY1-sY2)));x.strokeStyle="#dc2626";x.strokeRect(470,Math.min(sY1,sY2),220,Math.max(2,Math.abs(sY1-sY2)));x.fillStyle="#0284c7";x.font="bold 18px Arial";x.fillText("FORO",175,40);x.fillStyle="#dc2626";x.fillText("ALBERO",525,40)}
+function drawChart(hole,shaft){const c=document.getElementById("canvas");const x=c.getContext("2d");const W=c.width,H=c.height;x.clearRect(0,0,W,H);x.fillStyle="#fff";x.fillRect(0,0,W,H);const cy=H/2;const maxAbs=Math.max(...[hole.ES,hole.EI,shaft.es,shaft.ei].map(Math.abs),10);const sc=120/maxAbs;x.strokeStyle="#94a3b8";x.setLineDash([6,6]);x.beginPath();x.moveTo(30,cy);x.lineTo(W-30,cy);x.stroke();x.setLineDash([]);x.fillStyle="#475569";x.font="14px Arial";x.fillText("Linea zero",20,cy-8);const hY1=cy-hole.ES*sc,hY2=cy-hole.EI*sc;x.fillStyle="rgba(56,189,248,0.25)";x.fillRect(110,Math.min(hY1,hY2),220,Math.max(2,Math.abs(hY1-hY2)));x.strokeStyle="#0284c7";x.strokeRect(110,Math.min(hY1,hY2),220,Math.max(2,Math.abs(hY1-hY2)));const sY1=cy-shaft.es*sc,sY2=cy-shaft.ei*sc;x.fillStyle="rgba(239,68,68,0.25)";x.fillRect(470,Math.min(sY1,sY2),220,Math.max(2,Math.abs(sY1-sY2)));x.strokeStyle="#dc2626";x.strokeRect(470,Math.min(sY1,sY2),220,Math.max(2,Math.abs(sY1-sY2)));x.fillStyle="#0284c7";x.font="bold 18px Arial";x.fillText(translations[currentLang].hole,175,40);x.fillStyle="#dc2626";x.fillText(translations[currentLang].shaft,525,40)}
 function populateSelect(id,vals,def){const s=document.getElementById(id);s.innerHTML="";vals.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;if(v===def)o.selected=true;s.appendChild(o)})}
 populateSelect("holeLetter",holeLetters,"J");populateSelect("holeGrade",grades,"6");populateSelect("shaftLetter",shaftLetters,"j");populateSelect("shaftGrade",grades,"6");
-document.getElementById("calcBtn").addEventListener("click",calculate);calculate();
+document.getElementById("calcBtn").addEventListener("click",calculate);
+window.addEventListener('load', function() {
+  calculate();
+});
 </script>
 </body>
 </html>
