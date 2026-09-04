@@ -1,6 +1,6 @@
 {
-  "appId": "com.ouaid.forma",
-  "appName": "Tolleranze",
+  "appId": "com.ouaid.tolleranze",
+  "appName": "Tolleranze App",
   "webDir": "dist",
   "bundledWebRuntime": false
 }
