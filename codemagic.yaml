@@ -27,9 +27,11 @@ workflows:
         script: |
           sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' ios/App/App.xcodeproj/project.pbxproj
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' 's/MARKETING_VERSION = .*/MARKETING_VERSION = 1.2;/g' ios/App/App.xcodeproj/project.pbxproj
           sed -i '' "s/platform :ios.*/platform :ios, '15.0'/" ios/Podfile || echo "platform :ios, '15.0'" >> ios/Podfile
           sed -i '' 's/:ios, .*/:ios, "15.0"/' ios/App/Podfile 2>/dev/null || true
           cd ios/App
+          agvtool new-marketing-version 1.2
           agvtool new-version -all $BUILD_NUMBER
       - name: Configure code signing
         script: |
