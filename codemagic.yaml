@@ -1,15 +1,17 @@
 workflows:
   ios-workflow:
-    name: Morad iOS Release
+    name: Tolleranze iOS Release
     instance_type: mac_mini_m2
     max_build_duration: 60
+    integrations:
+      app_store_connect: Healthy Life - Vita Sana
     environment:
       xcode: latest
       node: 20.11.0
       cocoapods: default
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.morad.app
+        bundle_identifier: com.ouaid.tolleranze
 
     scripts:
       - name: Clean and build
@@ -36,11 +38,10 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
 
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        api_key: $APP_STORE_CONNECT_API_KEY_KEY_ID
+        key_id: M6VY6SU5HF
+        issuer_id: fb50db47-7aba-47c7-a9e6-a29837bbec4f
         submit_to_testflight: true
