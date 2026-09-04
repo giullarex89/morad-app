@@ -1,1 +1,6 @@
-
+{
+  "appId": "com.ouaid.forma",
+  "appName": "FORMA",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
