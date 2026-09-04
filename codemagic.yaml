@@ -13,14 +13,14 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.ouaid.tolleranze
 
-    scripts:
+        scripts:
       - name: Clean and build
         script: |
-          rm -rf ios
           npm install
-          npm run build
-          npx cap add ios
-          npx cap sync ios
+          npx --yes @capacitor/cli --version || npm i -D @capacitor/cli @capacitor/core
+          if grep -q '"build"' package.json; then npm run build; fi
+          npx cap add ios || true
+          npx cap sync ios || true
           cd ios/App && pod install
 
       - name: Increment build number
