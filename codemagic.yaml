@@ -13,12 +13,14 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.ouaid.tolleranze
 
-        scripts:
+    scripts:
       - name: Clean and build
         script: |
           npm install
           npx --yes @capacitor/cli --version || npm i -D @capacitor/cli @capacitor/core
-          if grep -q '"build"' package.json; then npm run build; fi
+          if grep -q '"build"' package.json; then
+            npm run build
+          fi
           npx cap add ios || true
           npx cap sync ios || true
           cd ios/App && pod install
@@ -38,6 +40,7 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
 
     publishing:
       app_store_connect:
