@@ -12,7 +12,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.ouaid.tolleranze
-
     scripts:
       - name: Clean and build
         script: |
@@ -24,27 +23,22 @@ workflows:
           npx cap add ios || true
           npx cap sync ios || true
           cd ios/App && pod install
-
-      - name: Increment build number
+      - name: Fix Bundle ID for update
         script: |
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' ios/App/App.xcodeproj/project.pbxproj
           cd ios/App
           agvtool new-version -all $BUILD_NUMBER
-
       - name: Configure code signing
         script: |
           xcode-project use-profiles
-
       - name: Build IPA
         script: |
           xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
-
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_API_KEY_KEY_ID
-        key_id: M6VY6SU5HF
-        issuer_id: fb50db47-7aba-47c7-a9e6-a29837bbec4f
+        auth: integration
+        api_key: Healthy Life - Vita Sana
         submit_to_testflight: true
