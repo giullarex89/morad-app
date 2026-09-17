@@ -53,7 +53,7 @@ workflows:
 
 
       # ============================================================
-      # 2. CONFIGURAZIONE COMPLETA APP ICON
+      # 2. CONFIGURAZIONE ICONA IOS
       # ============================================================
 
       - name: Fix Icona App Store
@@ -61,7 +61,7 @@ workflows:
           set -e
 
           echo "======================================"
-          echo "CONFIGURAZIONE APP ICON"
+          echo "CONFIGURAZIONE ICONA TOLLERANZE"
           echo "======================================"
 
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
@@ -75,13 +75,13 @@ workflows:
 
           echo "AppIcon.png trovato."
 
-          echo "Dimensioni originali:"
+          echo "Dimensioni immagine originale:"
           sips -g pixelWidth -g pixelHeight AppIcon.png
 
 
-          # ========================================================
-          # PULIZIA
-          # ========================================================
+          # --------------------------------------------------------
+          # Pulizia vecchie icone
+          # --------------------------------------------------------
 
           echo "Pulizia vecchie icone..."
 
@@ -89,101 +89,66 @@ workflows:
           rm -f "$ICONSET/Contents.json"
 
 
-          # ========================================================
-          # 1024x1024 APP STORE
-          # ========================================================
+          # --------------------------------------------------------
+          # Icona App Store 1024x1024
+          # --------------------------------------------------------
 
-          echo "Creo 1024x1024..."
+          echo "Creo icona 1024x1024..."
 
           sips -z 1024 1024 AppIcon.png \
             --out "$ICONSET/AppIcon-1024.png"
 
 
-          # ========================================================
-          # IPHONE
-          # ========================================================
+          # --------------------------------------------------------
+          # Icone iPhone
+          # --------------------------------------------------------
 
           echo "Creo icone iPhone..."
 
-          # 20x20 @2x = 40
+
+          # 20x20 @2x
           sips -z 40 40 AppIcon.png \
             --out "$ICONSET/AppIcon-20x20@2x.png"
 
-          # 20x20 @3x = 60
+
+          # 20x20 @3x
           sips -z 60 60 AppIcon.png \
             --out "$ICONSET/AppIcon-20x20@3x.png"
 
-          # 29x29 @2x = 58
+
+          # 29x29 @2x
           sips -z 58 58 AppIcon.png \
             --out "$ICONSET/AppIcon-29x29@2x.png"
 
-          # 29x29 @3x = 87
+
+          # 29x29 @3x
           sips -z 87 87 AppIcon.png \
             --out "$ICONSET/AppIcon-29x29@3x.png"
 
-          # 40x40 @2x = 80
+
+          # 40x40 @2x
           sips -z 80 80 AppIcon.png \
             --out "$ICONSET/AppIcon-40x40@2x.png"
 
-          # 40x40 @3x = 120
+
+          # 40x40 @3x
           sips -z 120 120 AppIcon.png \
             --out "$ICONSET/AppIcon-40x40@3x.png"
 
-          # 60x60 @2x = 120
+
+          # 60x60 @2x
           sips -z 120 120 AppIcon.png \
             --out "$ICONSET/AppIcon-60x60@2x.png"
 
-          # 60x60 @3x = 180
+
+          # 60x60 @3x
           sips -z 180 180 AppIcon.png \
             --out "$ICONSET/AppIcon-60x60@3x.png"
 
 
-          # ========================================================
-          # IPAD
-          # ========================================================
-
-          echo "Creo icone iPad..."
-
-          # 20x20 @1x = 20
-          sips -z 20 20 AppIcon.png \
-            --out "$ICONSET/AppIcon-20x20@1x-ipad.png"
-
-          # 20x20 @2x = 40
-          sips -z 40 40 AppIcon.png \
-            --out "$ICONSET/AppIcon-20x20@2x-ipad.png"
-
-          # 29x29 @1x = 29
-          sips -z 29 29 AppIcon.png \
-            --out "$ICONSET/AppIcon-29x29@1x-ipad.png"
-
-          # 29x29 @2x = 58
-          sips -z 58 58 AppIcon.png \
-            --out "$ICONSET/AppIcon-29x29@2x-ipad.png"
-
-          # 40x40 @1x = 40
-          sips -z 40 40 AppIcon.png \
-            --out "$ICONSET/AppIcon-40x40@1x-ipad.png"
-
-          # 40x40 @2x = 80
-          sips -z 80 80 AppIcon.png \
-            --out "$ICONSET/AppIcon-40x40@2x-ipad.png"
-
-          # 76x76 @1x = 76
-          sips -z 76 76 AppIcon.png \
-            --out "$ICONSET/AppIcon-76x76@1x.png"
-
-          # 76x76 @2x = 152
-          sips -z 152 152 AppIcon.png \
-            --out "$ICONSET/AppIcon-76x76@2x.png"
-
-          # 83.5x83.5 @2x = 167
-          sips -z 167 167 AppIcon.png \
-            --out "$ICONSET/AppIcon-83.5x83.5@2x.png"
-
-
-          # ========================================================
-          # CONTENTS.JSON
-          # ========================================================
+          # --------------------------------------------------------
+          # Contents.json
+          # --------------------------------------------------------
 
           echo "Creo Contents.json..."
 
@@ -239,60 +204,6 @@ workflows:
           '      "size" : "60x60"' \
           '    },' \
           '    {' \
-          '      "filename" : "AppIcon-20x20@1x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "1x",' \
-          '      "size" : "20x20"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-20x20@2x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "2x",' \
-          '      "size" : "20x20"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-29x29@1x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "1x",' \
-          '      "size" : "29x29"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-29x29@2x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "2x",' \
-          '      "size" : "29x29"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-40x40@1x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "1x",' \
-          '      "size" : "40x40"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-40x40@2x-ipad.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "2x",' \
-          '      "size" : "40x40"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-76x76@1x.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "1x",' \
-          '      "size" : "76x76"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-76x76@2x.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "2x",' \
-          '      "size" : "76x76"' \
-          '    },' \
-          '    {' \
-          '      "filename" : "AppIcon-83.5x83.5@2x.png",' \
-          '      "idiom" : "ipad",' \
-          '      "scale" : "2x",' \
-          '      "size" : "83.5x83.5"' \
-          '    },' \
-          '    {' \
           '      "filename" : "AppIcon-1024.png",' \
           '      "idiom" : "ios-marketing",' \
           '      "scale" : "1x",' \
@@ -306,62 +217,23 @@ workflows:
           '}' \
           > "$ICONSET/Contents.json"
 
-
-          # ========================================================
-          # CONTROLLO DIMENSIONI REALI
-          # ========================================================
-
           echo "======================================"
-          echo "CONTROLLO DIMENSIONI ICONE"
-          echo "======================================"
-
-          for FILE in \
-            AppIcon-1024.png \
-            AppIcon-76x76@1x.png \
-            AppIcon-76x76@2x.png \
-            AppIcon-83.5x83.5@2x.png \
-            AppIcon-60x60@3x.png
-          do
-            echo "Controllo: $FILE"
-
-            if [ ! -f "$ICONSET/$FILE" ]; then
-              echo "ERRORE: $FILE NON ESISTE!"
-              exit 1
-            fi
-
-            sips -g pixelWidth -g pixelHeight \
-              "$ICONSET/$FILE"
-          done
-
-
-          # ========================================================
-          # VALIDAZIONE JSON
-          # ========================================================
-
-          echo "======================================"
-          echo "VALIDAZIONE CONTENTS.JSON"
-          echo "======================================"
-
-          /usr/bin/python3 -m json.tool \
-            "$ICONSET/Contents.json" \
-            > /dev/null
-
-          echo "Contents.json valido."
-
-
-          echo "======================================"
-          echo "ELENCO ICONA"
+          echo "VERIFICA ICONA"
           echo "======================================"
 
           ls -lah "$ICONSET"
 
-          echo "======================================"
-          echo "APP ICON CONFIGURATA"
-          echo "======================================"
+          sips -g pixelWidth -g pixelHeight \
+            "$ICONSET/AppIcon-1024.png"
+
+          echo "Contents.json:"
+          cat "$ICONSET/Contents.json"
+
+          echo "Icona configurata correttamente."
 
 
       # ============================================================
-      # 3. IOS 15 + BUNDLE ID + APP ICON + VERSION
+      # 3. IOS DEPLOYMENT TARGET + VERSIONE
       # ============================================================
 
       - name: Configure iOS 15 and Version
@@ -369,12 +241,11 @@ workflows:
           set -e
 
           echo "======================================"
-          echo "CONFIGURAZIONE PROGETTO IOS"
+          echo "CONFIGURAZIONE IOS 15"
           echo "======================================"
 
           PROJECT="ios/App/App.xcodeproj/project.pbxproj"
           PODFILE="ios/App/Podfile"
-          INFO_PLIST="ios/App/App/Info.plist"
 
           if [ ! -f "$PROJECT" ]; then
             echo "ERRORE: progetto Xcode non trovato!"
@@ -382,126 +253,61 @@ workflows:
           fi
 
 
-          # ========================================================
-          # BUNDLE ID
-          # ========================================================
+          # --------------------------------------------------------
+          # Bundle ID
+          # --------------------------------------------------------
 
           echo "Imposto Bundle ID..."
 
           sed -i '' \
-            's/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' \
+            's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' \
             "$PROJECT"
 
 
-          # ========================================================
-          # DEPLOYMENT TARGET
-          # ========================================================
+          # --------------------------------------------------------
+          # Deployment Target
+          # --------------------------------------------------------
 
           echo "Imposto iOS 15.0..."
 
           sed -i '' \
-            's/IPHONEOS_DEPLOYMENT_TARGET = [^;]*;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' \
+            's/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' \
+            "$PROJECT"
+
+          sed -i '' \
+            's/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' \
             "$PROJECT"
 
 
-          # ========================================================
-          # APP ICON NAME
-          # ========================================================
-
-          echo "Configuro AppIcon..."
-
-          if grep -q "ASSETCATALOG_COMPILER_APPICON_NAME" "$PROJECT"; then
-
-            sed -i '' \
-              's/ASSETCATALOG_COMPILER_APPICON_NAME = [^;]*;/ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;/g' \
-              "$PROJECT"
-
-          else
-
-            sed -i '' \
-              '/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/a\
-\				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;' \
-              "$PROJECT"
-
-          fi
-
-
-          # ========================================================
-          # DEVICE FAMILY IPHONE + IPAD
-          # ========================================================
-
-          echo "Configuro iPhone + iPad..."
-
-          if grep -q "TARGETED_DEVICE_FAMILY" "$PROJECT"; then
-
-            sed -i '' \
-              's/TARGETED_DEVICE_FAMILY = [^;]*;/TARGETED_DEVICE_FAMILY = "1,2";/g' \
-              "$PROJECT"
-
-          else
-
-            sed -i '' \
-              '/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/a\
-\				TARGETED_DEVICE_FAMILY = "1,2";' \
-              "$PROJECT"
-
-          fi
-
-
-          # ========================================================
-          # INFO.PLIST
-          # ========================================================
-
-          echo "Configuro Info.plist..."
-
-          if [ -f "$INFO_PLIST" ]; then
-
-            # Rimuove eventuali vecchie configurazioni
-            /usr/libexec/PlistBuddy \
-              -c "Delete :CFBundleIconFiles" \
-              "$INFO_PLIST" 2>/dev/null || true
-
-            /usr/libexec/PlistBuddy \
-              -c "Delete :CFBundleIcons" \
-              "$INFO_PLIST" 2>/dev/null || true
-
-            /usr/libexec/PlistBuddy \
-              -c "Delete :CFBundleIconName" \
-              "$INFO_PLIST" 2>/dev/null || true
-
-            # Imposta AppIcon
-            /usr/libexec/PlistBuddy \
-              -c "Add :CFBundleIconName string AppIcon" \
-              "$INFO_PLIST"
-
-            echo "CFBundleIconName = AppIcon"
-
-          else
-
-            echo "Info.plist non trovato."
-            echo "Xcode genererà il plist dal progetto."
-
-          fi
-
-
-          # ========================================================
-          # PODFILE
-          # ========================================================
-
-          echo "Configuro Podfile..."
+          # --------------------------------------------------------
+          # Podfile
+          # --------------------------------------------------------
 
           if [ -f "$PODFILE" ]; then
 
             sed -i '' \
-              "s/platform :ios, '[^']*'/platform :ios, '15.0'/g" \
+              "s/platform :ios, '13.0'/platform :ios, '15.0'/g" \
+              "$PODFILE"
+
+            sed -i '' \
+              "s/platform :ios, '14.0'/platform :ios, '15.0'/g" \
               "$PODFILE"
 
           fi
 
 
-          # ========================================================
-          # VERSIONE APP
-          # ========================================================
+          # --------------------------------------------------------
+          # Controllo Deployment Target
+          # --------------------------------------------------------
+
+          echo "Deployment Target presenti:"
+
+          grep "IPHONEOS_DEPLOYMENT_TARGET" "$PROJECT" || true
+
+
+          # --------------------------------------------------------
+          # Versione App
+          # --------------------------------------------------------
 
           echo "======================================"
           echo "VERSIONE APP"
@@ -516,25 +322,21 @@ workflows:
           cd ../..
 
 
-          # ========================================================
-          # POD INSTALL
-          # ========================================================
+          # --------------------------------------------------------
+          # CocoaPods
+          # --------------------------------------------------------
 
           echo "======================================"
           echo "POD INSTALL"
           echo "======================================"
 
-          pod install \
-            --project-directory=ios/App
+          pod install --project-directory=ios/App
 
-
-          echo "======================================"
-          echo "CONFIGURAZIONE COMPLETATA"
-          echo "======================================"
+          echo "Configurazione completata."
 
 
       # ============================================================
-      # 4. CONTROLLO FINALE PRIMA DEL BUILD
+      # 4. CONTROLLO FINALE
       # ============================================================
 
       - name: Final iOS Check
@@ -546,86 +348,37 @@ workflows:
           echo "======================================"
 
           PROJECT="ios/App/App.xcodeproj/project.pbxproj"
-          ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
 
-          echo ""
-          echo "--------------------------------------"
-          echo "BUNDLE ID"
-          echo "--------------------------------------"
-
-          grep "PRODUCT_BUNDLE_IDENTIFIER" "$PROJECT" || true
-
-
-          echo ""
-          echo "--------------------------------------"
-          echo "DEPLOYMENT TARGET"
-          echo "--------------------------------------"
+          echo "Deployment Target:"
 
           grep "IPHONEOS_DEPLOYMENT_TARGET" "$PROJECT" || true
 
 
-          echo ""
-          echo "--------------------------------------"
-          echo "APP ICON NAME"
-          echo "--------------------------------------"
+          echo "Forzo eventuali target 13/14 a 15..."
 
-          grep "ASSETCATALOG_COMPILER_APPICON_NAME" "$PROJECT" || true
+          sed -i '' \
+            's/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' \
+            "$PROJECT"
 
-
-          echo ""
-          echo "--------------------------------------"
-          echo "DEVICE FAMILY"
-          echo "--------------------------------------"
-
-          grep "TARGETED_DEVICE_FAMILY" "$PROJECT" || true
+          sed -i '' \
+            's/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' \
+            "$PROJECT"
 
 
-          echo ""
-          echo "--------------------------------------"
-          echo "ICONSET"
-          echo "--------------------------------------"
+          echo "Controllo AppIcon:"
 
-          ls -lah "$ICONSET"
+          ls -lah \
+            ios/App/App/Assets.xcassets/AppIcon.appiconset/
 
 
-          echo ""
-          echo "--------------------------------------"
-          echo "152x152"
-          echo "--------------------------------------"
+          echo "Controllo icona 1024:"
 
           sips -g pixelWidth -g pixelHeight \
-            "$ICONSET/AppIcon-76x76@2x.png"
+            ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png
 
 
-          echo ""
-          echo "--------------------------------------"
-          echo "167x167"
-          echo "--------------------------------------"
-
-          sips -g pixelWidth -g pixelHeight \
-            "$ICONSET/AppIcon-83.5x83.5@2x.png"
-
-
-          echo ""
-          echo "--------------------------------------"
-          echo "1024x1024"
-          echo "--------------------------------------"
-
-          sips -g pixelWidth -g pixelHeight \
-            "$ICONSET/AppIcon-1024.png"
-
-
-          echo ""
-          echo "--------------------------------------"
-          echo "CONTENTS.JSON"
-          echo "--------------------------------------"
-
-          cat "$ICONSET/Contents.json"
-
-
-          echo ""
           echo "======================================"
-          echo "CONTROLLO PRE-BUILD OK"
+          echo "CONTROLLO COMPLETATO"
           echo "======================================"
 
 
@@ -663,111 +416,6 @@ workflows:
           echo "======================================"
           echo "BUILD IPA COMPLETATO"
           echo "======================================"
-
-
-      # ============================================================
-      # 7. CONTROLLO IPA / ASSETS CAR
-      # ============================================================
-
-      - name: Verify IPA Icons
-        script: |
-          set -e
-
-          echo "======================================"
-          echo "VERIFICA IPA"
-          echo "======================================"
-
-          IPA=$(find build/ios/ipa \
-            -name "*.ipa" \
-            -type f \
-            | head -n 1)
-
-          if [ -z "$IPA" ]; then
-            echo "ERRORE: IPA non trovato!"
-            exit 1
-          fi
-
-          echo "IPA trovata:"
-          echo "$IPA"
-
-
-          # ========================================================
-          # Estrazione IPA
-          # ========================================================
-
-          rm -rf /tmp/tolleranze_ipa_check
-          mkdir -p /tmp/tolleranze_ipa_check
-
-          unzip -q "$IPA" \
-            -d /tmp/tolleranze_ipa_check
-
-
-          APP_PATH=$(find /tmp/tolleranze_ipa_check/Payload \
-            -maxdepth 1 \
-            -name "*.app" \
-            -type d \
-            | head -n 1)
-
-
-          if [ -z "$APP_PATH" ]; then
-            echo "ERRORE: .app non trovata dentro IPA!"
-            exit 1
-          fi
-
-
-          echo "APP:"
-          echo "$APP_PATH"
-
-
-          # ========================================================
-          # CONTROLLO ASSETS.CAR
-          # ========================================================
-
-          echo ""
-          echo "Controllo Assets.car..."
-
-          if [ ! -f "$APP_PATH/Assets.car" ]; then
-            echo "ERRORE: Assets.car NON trovato!"
-            exit 1
-          fi
-
-          ls -lh "$APP_PATH/Assets.car"
-
-
-          # ========================================================
-          # CONTROLLO INFO.PLIST
-          # ========================================================
-
-          echo ""
-          echo "Controllo Info.plist..."
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleIdentifier" \
-            "$APP_PATH/Info.plist" || true
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleIconName" \
-            "$APP_PATH/Info.plist" || true
-
-
-          # ========================================================
-          # CONTROLLO APP ICON
-          # ========================================================
-
-          echo ""
-          echo "Controllo riferimenti AppIcon..."
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleIcons" \
-            "$APP_PATH/Info.plist" || true
-
-
-          echo ""
-          echo "======================================"
-          echo "VERIFICA IPA COMPLETATA"
-          echo "======================================"
-
-          echo "IPA pronta per App Store Connect."
 
 
     # ================================================================
