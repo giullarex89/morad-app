@@ -78,6 +78,18 @@ workflows:
           echo "Dimensioni immagine originale:"
           sips -g pixelWidth -g pixelHeight AppIcon.png
 
+          # Controllo se l'immagine ha trasparenza (canale alpha)
+          echo "Controllo canale alpha..."
+          if sips -g hasAlpha AppIcon.png | grep -q "yes"; then
+            echo "ATTENZIONE: AppIcon.png contiene trasparenza. App Store Connect potrebbe rifiutarla."
+            echo "Rimuovo il canale alpha forzatamente..."
+            sips -s format png -s formatOptions best --deleteColorManagementProperties AppIcon.png --out AppIcon_noalpha.png
+            mv AppIcon_noalpha.png AppIcon.png
+            echo "Canale alpha rimosso."
+          else
+            echo "Nessuna trasparenza rilevata. OK."
+          fi
+
 
           # --------------------------------------------------------
           # Pulizia vecchie icone
@@ -147,6 +159,21 @@ workflows:
 
 
           # --------------------------------------------------------
+          # Icone iPad (AGGIUNTE PER RISOLVERE L'ERRORE 90023)
+          # --------------------------------------------------------
+
+          echo "Creo icone iPad..."
+
+          # iPad 76x76 @2x (152x152)
+          sips -z 152 152 AppIcon.png \
+            --out "$ICONSET/AppIcon-76x76@2x.png"
+
+          # iPad Pro 83.5x83.5 @2x (167x167)
+          sips -z 167 167 AppIcon.png \
+            --out "$ICONSET/AppIcon-83.5x83.5@2x.png"
+
+
+          # --------------------------------------------------------
           # Contents.json
           # --------------------------------------------------------
 
@@ -202,6 +229,18 @@ workflows:
           '      "idiom" : "iphone",' \
           '      "scale" : "3x",' \
           '      "size" : "60x60"' \
+          '    },' \
+          '    {' \
+          '      "filename" : "AppIcon-76x76@2x.png",' \
+          '      "idiom" : "ipad",' \
+          '      "scale" : "2x",' \
+          '      "size" : "76x76"' \
+          '    },' \
+          '    {' \
+          '      "filename" : "AppIcon-83.5x83.5@2x.png",' \
+          '      "idiom" : "ipad",' \
+          '      "scale" : "2x",' \
+          '      "size" : "83.5x83.5"' \
           '    },' \
           '    {' \
           '      "filename" : "AppIcon-1024.png",' \
