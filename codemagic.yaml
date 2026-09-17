@@ -3,59 +3,337 @@ workflows:
     name: Tolleranze iOS Release
     instance_type: mac_mini_m2
     max_build_duration: 60
+
     integrations:
       app_store_connect: Healthy Life - Vita Sana
+
     environment:
       xcode: latest
       node: 22.11.0
       cocoapods: default
+
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.ouaid.tolleranze
+
     scripts:
+
+      # ============================================================
+      # 1. INSTALLAZIONE E CAPACITOR
+      # ============================================================
       - name: Install and Sync
         script: |
+          set -e
+
+          echo "======================================"
+          echo "INSTALLAZIONE PROGETTO"
+          echo "======================================"
+
           npm install
-          if grep -q '"build"' package.json; then npm run build; fi
-          if [ ! -d "ios" ]; then npx cap add ios; fi
+
+          echo "======================================"
+          echo "BUILD WEB"
+          echo "======================================"
+
+          if grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "Nessun comando build trovato in package.json"
+          fi
+
+          echo "======================================"
+          echo "CAPACITOR IOS"
+          echo "======================================"
+
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+
           npx cap copy ios
           npx cap sync ios
-      - name: Fix Icona FINALE - solo AppIcon.png
+
+          echo "Capacitor completato."
+
+
+      # ============================================================
+      # 2. CREA/RICREA COMPLETAMENTE LE ICONE IOS
+      # ============================================================
+      - name: Fix Icona App Store
         script: |
           set -e
+
+          echo "======================================"
+          echo "CONFIGURAZIONE ICONA TOLLERANZE"
+          echo "======================================"
+
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
-          mkdir -p $ICONSET
-          echo "Uso AppIcon.png come sorgente"
-          ls -l AppIcon.png
-          sips -Z 1024 AppIcon.png --out $ICONSET/AppIcon-1024.png
-          cp $ICONSET/AppIcon-1024.png $ICONSET/AppIcon.png
-          sips -Z 20 AppIcon.png --out $ICONSET/AppIcon-20x20@1x.png
-          sips -Z 40 AppIcon.png --out $ICONSET/AppIcon-20x20@2x.png
-          sips -Z 60 AppIcon.png --out $ICONSET/AppIcon-20x20@3x.png
-          sips -Z 29 AppIcon.png --out $ICONSET/AppIcon-29x29@1x.png
-          sips -Z 58 AppIcon.png --out $ICONSET/AppIcon-29x29@2x.png
-          sips -Z 87 AppIcon.png --out $ICONSET/AppIcon-29x29@3x.png
-          sips -Z 40 AppIcon.png --out $ICONSET/AppIcon-40x40@1x.png
-          sips -Z 80 AppIcon.png --out $ICONSET/AppIcon-40x40@2x.png
-          sips -Z 120 AppIcon.png --out $ICONSET/AppIcon-40x40@3x.png
-          sips -Z 120 AppIcon.png --out $ICONSET/AppIcon-60x60@2x.png
-          sips -Z 180 AppIcon.png --out $ICONSET/AppIcon-60x60@3x.png
-          ls -l $ICONSET/
-          echo "Icone generate OK"
+
+          mkdir -p "$ICONSET"
+
+          # --------------------------------------------------------
+          # Controllo AppIcon.png
+          # --------------------------------------------------------
+
+          if [ ! -f "AppIcon.png" ]; then
+            echo "ERRORE: AppIcon.png NON trovato nella root del progetto."
+            echo "Controlla che il file sia presente nel repository GitHub."
+            exit 1
+          fi
+
+          echo "AppIcon.png trovato."
+
+          echo "Dimensioni immagine originale:"
+          sips -g pixelWidth -g pixelHeight AppIcon.png
+
+
+          # --------------------------------------------------------
+          # Elimina eventuali vecchie icone
+          # --------------------------------------------------------
+
+          echo "Elimino vecchie icone..."
+
+          rm -f "$ICONSET"/*.png
+          rm -f "$ICONSET/Contents.json"
+
+
+          # --------------------------------------------------------
+          # ICONA APP STORE 1024x1024
+          # --------------------------------------------------------
+
+          echo "Creo icona 1024x1024..."
+
+          sips -z 1024 1024 AppIcon.png \
+            --out "$ICONSET/AppIcon-1024.png"
+
+
+          # --------------------------------------------------------
+          # ICONE IPHONE
+          # --------------------------------------------------------
+
+          echo "Creo icone iPhone..."
+
+
+          # 20x20 @2x = 40x40
+          sips -z 40 40 AppIcon.png \
+            --out "$ICONSET/AppIcon-20x20@2x.png"
+
+
+          # 20x20 @3x = 60x60
+          sips -z 60 60 AppIcon.png \
+            --out "$ICONSET/AppIcon-20x20@3x.png"
+
+
+          # 29x29 @2x = 58x58
+          sips -z 58 58 AppIcon.png \
+            --out "$ICONSET/AppIcon-29x29@2x.png"
+
+
+          # 29x29 @3x = 87x87
+          sips -z 87 87 AppIcon.png \
+            --out "$ICONSET/AppIcon-29x29@3x.png"
+
+
+          # 40x40 @2x = 80x80
+          sips -z 80 80 AppIcon.png \
+            --out "$ICONSET/AppIcon-40x40@2x.png"
+
+
+          # 40x40 @3x = 120x120
+          sips -z 120 120 AppIcon.png \
+            --out "$ICONSET/AppIcon-40x40@3x.png"
+
+
+          # 60x60 @2x = 120x120
+          sips -z 120 120 AppIcon.png \
+            --out "$ICONSET/AppIcon-60x60@2x.png"
+
+
+          # 60x60 @3x = 180x180
+          sips -z 180 180 AppIcon.png \
+            --out "$ICONSET/AppIcon-60x60@3x.png"
+
+
+          # --------------------------------------------------------
+          # CONTENTS.JSON
+          # --------------------------------------------------------
+
+          echo "Creo Contents.json..."
+
+          cat > "$ICONSET/Contents.json" <<'EOF'
+{
+  "images" : [
+    {
+      "filename" : "AppIcon-20x20@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "AppIcon-20x20@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "AppIcon-29x29@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "AppIcon-29x29@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "AppIcon-40x40@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "AppIcon-40x40@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "AppIcon-60x60@2x.png",
+      "idiom" : "iphone",
+      "scale" : "2x",
+      "size" : "60x60"
+    },
+    {
+      "filename" : "AppIcon-60x60@3x.png",
+      "idiom" : "iphone",
+      "scale" : "3x",
+      "size" : "60x60"
+    },
+    {
+      "filename" : "AppIcon-1024.png",
+      "idiom" : "ios-marketing",
+      "scale" : "1x",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
+EOF
+
+
+          # --------------------------------------------------------
+          # VERIFICHE
+          # --------------------------------------------------------
+
+          echo "======================================"
+          echo "VERIFICA FILE ICONA"
+          echo "======================================"
+
+          ls -lah "$ICONSET"
+
+
+          echo "======================================"
+          echo "VERIFICA ICONA 1024x1024"
+          echo "======================================"
+
+          sips -g pixelWidth -g pixelHeight \
+            "$ICONSET/AppIcon-1024.png"
+
+
+          echo "======================================"
+          echo "CONTENTS.JSON"
+          echo "======================================"
+
+          cat "$ICONSET/Contents.json"
+
+
+          echo "======================================"
+          echo "ICONA CONFIGURATA CORRETTAMENTE"
+          echo "======================================"
+
+
+      # ============================================================
+      # 3. VERSIONE E BUILD NUMBER
+      # ============================================================
       - name: Bump Version
         script: |
-          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' ios/App/App.xcodeproj/project.pbxproj
+          set -e
+
+          echo "======================================"
+          echo "CONFIGURAZIONE BUNDLE ID"
+          echo "======================================"
+
+          sed -i '' \
+            's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' \
+            ios/App/App.xcodeproj/project.pbxproj
+
           cd ios/App
+
+          echo "Imposto versione 1.4..."
+
           agvtool new-marketing-version 1.4
-          agvtool new-version -all $BUILD_NUMBER
+
+          echo "Imposto Build Number: $BUILD_NUMBER"
+
+          agvtool new-version -all "$BUILD_NUMBER"
+
           cd ../..
+
+          echo "======================================"
+          echo "POD INSTALL"
+          echo "======================================"
+
           pod install --project-directory=ios/App
+
+
+      # ============================================================
+      # 4. CODE SIGNING
+      # ============================================================
       - name: Configure code signing
-        script: xcode-project use-profiles
+        script: |
+          set -e
+
+          echo "======================================"
+          echo "CONFIGURAZIONE CODE SIGNING"
+          echo "======================================"
+
+          xcode-project use-profiles
+
+
+      # ============================================================
+      # 5. BUILD IPA
+      # ============================================================
       - name: Build IPA
-        script: xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+        script: |
+          set -e
+
+          echo "======================================"
+          echo "BUILD IPA"
+          echo "======================================"
+
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
+
+          echo "======================================"
+          echo "BUILD COMPLETATO"
+          echo "======================================"
+
+
+    # ================================================================
+    # ARTIFACTS
+    # ================================================================
     artifacts:
       - build/ios/ipa/*.ipa
+
+
+    # ================================================================
+    # TESTFLIGHT / APP STORE CONNECT
+    # ================================================================
     publishing:
       app_store_connect:
         auth: integration
