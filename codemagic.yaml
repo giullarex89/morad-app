@@ -16,63 +16,55 @@ workflows:
       - name: Install and Sync
         script: |
           npm install
-          npx --yes @capacitor/cli --version || npm i -D @capacitor/cli @capacitor/core
-          if grep -q '"build"' package.json; then
-            npm run build
-          fi
-          # NON ricreare ios da zero ogni volta!
-          if [ ! -d "ios" ]; then
-            npx cap add ios
-          fi
+          if grep -q '"build"' package.json; then npm run build; fi
+          if [ ! -d "ios" ]; then npx cap add ios; fi
           npx cap copy ios
           npx cap sync ios
 
-      - name: Fix Icons - QUESTO È IL FIX
+      - name: Fix Icons + Lingue
         script: |
-          echo "--- Fixing AppIcon ---"
           ICONSET="ios/App/App/Assets.xcassets/AppIcon.appiconset"
           mkdir -p $ICONSET
-          
-          # Copia la 1024 per App Store
           cp icon-1024.png $ICONSET/AppIcon-1024.png
           cp AppIcon.png $ICONSET/AppIcon.png
+          sips -z 20 20 icon-1024.png --out $ICONSET/AppIcon-20x20@1x.png
+          sips -z 40 40 icon-1024.png --out $ICONSET/AppIcon-20x20@2x.png
+          sips -z 60 60 icon-1024.png --out $ICONSET/AppIcon-20x20@3x.png
+          sips -z 29 29 icon-1024.png --out $ICONSET/AppIcon-29x29@1x.png
+          sips -z 58 58 icon-1024.png --out $ICONSET/AppIcon-29x29@2x.png
+          sips -z 87 87 icon-1024.png --out $ICONSET/AppIcon-29x29@3x.png
+          sips -z 40 40 icon-1024.png --out $ICONSET/AppIcon-40x40@1x.png
+          sips -z 80 80 icon-1024.png --out $ICONSET/AppIcon-40x40@2x.png
+          sips -z 120 120 icon-1024.png --out $ICONSET/AppIcon-40x40@3x.png
+          sips -z 120 120 icon-1024.png --out $ICONSET/AppIcon-60x60@2x.png
+          sips -z 180 180 icon-1024.png --out $ICONSET/AppIcon-60x60@3x.png
           
-          # Genera tutte le icone richieste da iOS dalla tua 1024
-          sips -z 20 20     icon-1024.png --out $ICONSET/AppIcon-20x20@1x.png
-          sips -z 40 40     icon-1024.png --out $ICONSET/AppIcon-20x20@2x.png
-          sips -z 60 60     icon-1024.png --out $ICONSET/AppIcon-20x20@3x.png
-          sips -z 29 29     icon-1024.png --out $ICONSET/AppIcon-29x29@1x.png
-          sips -z 58 58     icon-1024.png --out $ICONSET/AppIcon-29x29@2x.png
-          sips -z 87 87     icon-1024.png --out $ICONSET/AppIcon-29x29@3x.png
-          sips -z 40 40     icon-1024.png --out $ICONSET/AppIcon-40x40@1x.png
-          sips -z 80 80     icon-1024.png --out $ICONSET/AppIcon-40x40@2x.png
-          sips -z 120 120   icon-1024.png --out $ICONSET/AppIcon-40x40@3x.png
-          sips -z 120 120   icon-1024.png --out $ICONSET/AppIcon-60x60@2x.png
-          sips -z 180 180   icon-1024.png --out $ICONSET/AppIcon-60x60@3x.png
-          
-          ls -l $ICONSET/
-          npx cap copy ios
+          # FIX LINGUE - aggiunge en e de senza cancellare ios
+          mkdir -p ios/App/App/en.lproj ios/App/App/de.lproj
+          echo 'CFBundleDisplayName = "Tolerances";' > ios/App/App/en.lproj/InfoPlist.strings
+          echo 'CFBundleDisplayName = "Toleranzen";' > ios/App/App/de.lproj/InfoPlist.strings
+          # dice a Xcode che ci sono 3 lingue
+          /usr/libexec/PlistBuddy -c "Add CFBundleLocalizations array" ios/App/App/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add CFBundleLocalizations:0 string en" ios/App/App/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add CFBundleLocalizations:1 string de" ios/App/App/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add CFBundleLocalizations:2 string it" ios/App/App/Info.plist || true
 
       - name: Fix Bundle ID and Version
         script: |
           sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.ouaid.tolleranze;/g' ios/App/App.xcodeproj/project.pbxproj
           cd ios/App
-          agvtool new-marketing-version 1.3
+          agvtool new-marketing-version 1.4
           agvtool new-version -all $BUILD_NUMBER
           cd ../..
           pod install --project-directory=ios/App
 
       - name: Configure code signing
-        script: |
-          xcode-project use-profiles
+        script: xcode-project use-profiles
       - name: Build IPA
-        script: |
-          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+        script: xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-        
